@@ -4,6 +4,7 @@
   "dependencies": {
     "bootstrap": "~3.2.0",
     "transparency": "latest",
+    "moment": "latest",
     "underscore": "latest"
   }
 }
