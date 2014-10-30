@@ -9,9 +9,15 @@ var url = "http://www.buzzfeed.com/buzzfeed/api/comments?buzz_id=3371338"
 
 START_ROUTE = "/start"
 
+
 var buzzfeed = (function () {
   var buzzfeed = {}
-  buzzfeed.startRoom = ""
+
+  //Constants
+  buzzfeed.DISPLAY_NUM = 100
+  //this would come in dynamically
+  buzzfeed.ARTICLE_NAME = "ARTICLE NAME"
+
   buzzfeed.commentArr = [
     {
       "badge_title": "OMG",
@@ -1658,6 +1664,9 @@ var buzzfeed = (function () {
   buzzfeed.reactions = []
   buzzfeed.reactionTallies = {}
   buzzfeed.bots = []
+  buzzfeed.gifReactions = []
+  buzzfeed.imageReactions = []
+  buzzfeed.users = {}
 
   function init() {
     start();
@@ -1686,24 +1695,45 @@ var buzzfeed = (function () {
 
   buzzfeed.separateCommentTypes = function () {
 
-
-    //separate comments into two main types: text comments and reactions
+    //separate comments into two main types for this exercise: text comments and reactions
     _.each(buzzfeed.commentArr, function (e, i, l) {
       //make human date for later consumption
       e.humanDate = buzzfeed.humanizeDate(e.f_raw)
       e.dateDiff = buzzfeed.dateDiff(e.f_raw)
 
+      //nice and easy, lets take the text comments out of the equation
       if (e.form == "text") {
         buzzfeed.textComments.push(e)
       }
-      //lets get those bots outta here
+      //get those bots outta here
       else if (e.form == "link-traffic") {
         buzzfeed.bots.push(e)
       }
-      //use this for loop to count different badges, will be displayed in chart form later
+      //reserve this for handling gif reactions
+      else if (e.form == "react_image") {
+        buzzfeed.gifReactions.push(e)
+      }
+      //reserve this for handling image reactions
+      else if (e.form == "image") {
+        buzzfeed.imageReactions.push(e)
+      }
+      //and finally, the reactions
       else {
+        //use this for loop to count different badges, will be displayed in chart form later
         buzzfeed.reactions.push(e)
-        //other reaction types
+
+
+        //need to check if user had more than one reaction to post, will be used later to populate
+        //their reactions output accordingly.
+        if (!buzzfeed.users[e.user_id]) {
+          buzzfeed.users[e.user_id] = []
+          buzzfeed.users[e.user_id].push(e)
+        } else {
+          buzzfeed.users[e.user_id].push(e)
+        }
+
+
+
         if (!e.badge_title) {
         }
         //we have badges, add them up
@@ -1715,14 +1745,106 @@ var buzzfeed = (function () {
       }
 
     });
-    console.log(JSON.stringify(buzzfeed.textComments))
+    buzzfeed.populateTabs();
+    console.log(JSON.stringify(buzzfeed.users))
 
   }
+
+  buzzfeed.populateTabs = function (inTab) {
+
+
+
+    $('#comments').render(buzzfeed.textComments);
+
+    var directives = {
+      myId: {
+        text: function(params) {
+          return "User " +this.user_id
+        }
+      },
+
+      //heres the deal: if a user has multiple entries that means they have had several reactions
+      //to the article. this will make their reaction output different than other users that
+      //only had one. we will leverage the user object to gleam their entire response, then
+      //remove them from the reactionArr. This will prevent against duplicates
+      userText: {
+        text: function(params) {
+          var retStr;
+
+          if (buzzfeed.users[this.user_id].length > 1) {
+            var likeCount=0;
+            var reactionArr=[];
+
+            var result = $.grep(buzzfeed.users[this.user_id], function(e){
+              var retVal = (e.form == ("hates" || "loves"))
+              if (retVal) {
+                likeCount++
+              } else {
+                reactionArr.push(e.badge_title)
+              }
+              return retVal;
+            });
+
+            //liked and reacted
+            if (likeCount ==1) {
+              retStr = "liked this article!"
+
+            }
+            //TODO: handle this double like case
+            else if(likeCount ==2){
+              console.log('wierd double like case happening')
+
+            }
+            //they just reacted to the article without liking
+            else {
+              console.log('got hereeeee')
+              retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + reactionArr
+            }
+
+            console.log(this.user_id + " LC  "+likeCount)
+
+            //remove from the main reaction object to avoid duplicates
+
+          } else {
+
+
+          }
+
+          return retStr
+        }
+
+
+      }
+    };
+
+    $('#reactions').render(buzzfeed.reactions, directives);
+
+
+  }
+
+  buzzfeed.switchTabs = function (inTab) {
+
+    console.log("switching tabs to " + inTab)
+
+    switch (inTab) {
+      case "all":
+
+        break;
+      case "comments":
+
+        break;
+      case "reactions":
+
+        break;
+      default :
+        console.log("switchingError")
+    }
+  }
+
+
+
   buzzfeed.humanizeDate = function (inDate) {
-    var humanDate = moment(inDate)
-    var now = moment();
-    var diff = (now.diff(humanDate, 'days'))
-    return humanDate
+    return moment(inDate).format('hh:mm A');
   }
   buzzfeed.dateDiff = function (inDate) {
     var humanDate = moment(inDate)
