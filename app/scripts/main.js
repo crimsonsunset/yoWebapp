@@ -1746,7 +1746,7 @@ var buzzfeed = (function () {
 
     });
     buzzfeed.populateTabs();
-    console.log(JSON.stringify(buzzfeed.users))
+    console.log(JSON.stringify(buzzfeed.users.length))
 
   }
 
@@ -1769,43 +1769,70 @@ var buzzfeed = (function () {
       //remove them from the reactionArr. This will prevent against duplicates
       userText: {
         text: function(params) {
-          var retStr;
+          var retStr="";
 
+          console.log("WORKING ON " + this.user_id)
+
+          //a user has reacted more than once
           if (buzzfeed.users[this.user_id].length > 1) {
             var likeCount=0;
             var reactionArr=[];
+            var i=0;
+            var likeIndArr = []
+            var userId = this.user_id
 
-            var result = $.grep(buzzfeed.users[this.user_id], function(e){
-              var retVal = (e.form == ("hates" || "loves"))
+            //check if one of the reactions is a loves or hates type
+            $.grep(buzzfeed.users[this.user_id], function(e){
+              var retVal = ((e.form == "hates" )||( e.form == "loves") )
               if (retVal) {
+                likeIndArr.push(i)
                 likeCount++
               } else {
                 reactionArr.push(e.badge_title)
               }
+              i++;
               return retVal;
             });
 
-            //liked and reacted
-            if (likeCount ==1) {
-              retStr = "liked this article!"
-
+            //loved and hated the article
+            if(likeCount ==2){
+              //1664046
+              //just love and hate, no badge
+              if (reactionArr.length == 0) {
+                retStr = buzzfeed.users[this.user_id][likeIndArr[0]].form +" & " + buzzfeed.users[this.user_id][likeIndArr[1]].form +" "+ buzzfeed.ARTICLE_NAME
+              }
+              //they have loved,hated, and badgevoted this article (overachievers)
+              else {
+                for (var j = 0; j < likeIndArr.length; j++) {
+                  retStr += buzzfeed.users[this.user_id][likeIndArr[j]].form ;
+                  var amp = (j == likeIndArr.length-2) ? " & " : ""
+                  retStr+=amp
+                }
+                retStr += " and thinks it's "+ reactionArr
+              }
             }
-            //TODO: handle this double like case
-            else if(likeCount ==2){
-              console.log('wierd double like case happening')
-
+            //liked and reacted
+            else if (likeCount ==1 && reactionArr.length != 0){
+              retStr = buzzfeed.users[this.user_id][likeIndArr[0]].form +" "+ buzzfeed.ARTICLE_NAME + " and thinks it's "+ reactionArr
             }
             //they just reacted to the article without liking
             else {
-              console.log('got hereeeee')
               retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + reactionArr
             }
 
-            console.log(this.user_id + " LC  "+likeCount)
-
             //remove from the main reaction object to avoid duplicates
 
-          } else {
+          }
+          //only reacted once, find out what type it is
+          else {
+            if (buzzfeed.users[this.user_id][0].form == "badge_vote") {
+              retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + buzzfeed.users[this.user_id][0].badge_title
+
+            }
+            //they have only liked it
+            else {
+              retStr = buzzfeed.users[this.user_id][0].form +" " + buzzfeed.ARTICLE_NAME
+            }
 
 
           }
