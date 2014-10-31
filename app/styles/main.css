@@ -1,3 +1,55 @@
+.comment {
+  font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
+  background-color: #eee;
+  margin-top: 10px;
+}
+
+.userInfo {
+   font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
+   float: left;
+   height: 50px;
+   width: 100%;
+ }
+
+.userImg {
+  float: left;
+  margin-top: 12px;
+  margin-left: 10px;
+  height: 25px;
+  width: 25px;
+}
+
+.userId {
+  float: bottom;
+  margin-top: 10px;
+  height: 16px;
+  margin-left: 40px;
+}
+
+.timestamp {
+  height: 12px;
+  margin-left: 40px;
+  font-size: 10px;
+}
+
+.blurb {
+  margin-left: 10px;
+  font-size: 16px;
+  padding-bottom: 15px;
+
+}
+
+.badges {
+  font: bold 10px "Helvetica Neue",Arial,Helvetica,sans-serif;
+  text-transform: uppercase;
+  color: #000;
+  background: #fe0;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;

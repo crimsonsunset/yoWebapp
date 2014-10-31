@@ -33,7 +33,7 @@
   </div>
 
 
-  <div class="container" >
+  <div class="container"  >
     <ul class="nav nav-tabs">
       <li class="active">
         <a href="#all" data-toggle="tab" onclick="buzzfeed.switchTabs('all');">All</a>
@@ -45,20 +45,31 @@
         <a href="#reactions" data-toggle="tab" onclick="buzzfeed.switchTabs('reactions');">Reactions</a>
       </li>
     </ul>
-    <div class="tab-content" id="commentContainer">
-      <div class="col-sm-8 tab-pane active" id="all">
-      </div>
-      <div class="col-sm-8 tab-pane" id="comments">
 
-        <div class="comment" style="border: 2px solid">
-          <img src="img/user.jpg">
-          <div id="user_id"><p></p></div>
-          <div id="dateDiff"><p></p></div>
-          <div id="blurb"><p></p></div>
+
+
+    <div class="tab-content" id="commentContainer">
+      <div class="tab-pane active" id="all" >
+      </div>
+
+
+      <div class="tab-pane" id="comments">
+
+        <div class="comment" >
+          <div class="userInfo" >
+          <img class="userImg" src="img/user.jpg">
+          <div class="userId" id="user_id"></div>
+          <div class="timestamp" id="dateDiff"></div>
+        </div>
+          <div class="blurb" id="blurb"></div>
         </div>
 
       </div>
-      <div class="col-sm-8 tab-pane" id="reactions">
+
+
+
+
+      <div class="tab-pane" id="reactions">
 
         <div class="reaction" style="border: 2px solid">
           <span class="myId"></span>
