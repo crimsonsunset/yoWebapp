@@ -1667,6 +1667,8 @@ var buzzfeed = (function () {
   buzzfeed.gifReactions = []
   buzzfeed.imageReactions = []
   buzzfeed.users = {}
+  buzzfeed.innerCommentStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
+
 
   function init() {
     start();
@@ -1703,6 +1705,7 @@ var buzzfeed = (function () {
 
       //nice and easy, lets take the text comments out of the equation
       if (e.form == "text") {
+        e.blurb = cleanStrings(e.blurb)
         buzzfeed.textComments.push(e)
       }
       //get those bots outta here
@@ -1720,7 +1723,6 @@ var buzzfeed = (function () {
       //and finally, the reactions
       else {
         //use this for loop to count different badges, will be displayed in chart form later
-        buzzfeed.reactions.push(e)
 
 
         //need to check if user had more than one reaction to post, will be used later to populate
@@ -1728,8 +1730,12 @@ var buzzfeed = (function () {
         if (!buzzfeed.users[e.user_id]) {
           buzzfeed.users[e.user_id] = []
           buzzfeed.users[e.user_id].push(e)
+          //only add to the reaction array the first time, will use the users object as reference later
+          buzzfeed.reactions.push(e)
         } else {
           buzzfeed.users[e.user_id].push(e)
+
+
         }
 
 
@@ -1746,15 +1752,10 @@ var buzzfeed = (function () {
 
     });
     buzzfeed.populateTabs();
-    console.log(JSON.stringify(buzzfeed.users.length))
 
   }
 
   buzzfeed.populateTabs = function (inTab) {
-
-
-
-    $('#comments').render(buzzfeed.textComments);
 
     var directives = {
       myId: {
@@ -1771,7 +1772,7 @@ var buzzfeed = (function () {
         text: function(params) {
           var retStr="";
 
-          console.log("WORKING ON " + this.user_id)
+          //console.log("WORKING ON " + this.user_id)
 
           //a user has reacted more than once
           if (buzzfeed.users[this.user_id].length > 1) {
@@ -1780,6 +1781,7 @@ var buzzfeed = (function () {
             var i=0;
             var likeIndArr = []
             var userId = this.user_id
+
 
             //check if one of the reactions is a loves or hates type
             $.grep(buzzfeed.users[this.user_id], function(e){
@@ -1793,6 +1795,8 @@ var buzzfeed = (function () {
               i++;
               return retVal;
             });
+            var reactionStr = String(reactionArr)
+            reactionStr = reactionStr.replace(/,/g , " & ");
 
             //loved and hated the article
             if(likeCount ==2){
@@ -1808,20 +1812,18 @@ var buzzfeed = (function () {
                   var amp = (j == likeIndArr.length-2) ? " & " : ""
                   retStr+=amp
                 }
-                retStr += " and thinks it's "+ reactionArr
+                retStr += " and thinks it's "+ reactionStr
               }
             }
             //liked and reacted
             else if (likeCount ==1 && reactionArr.length != 0){
-              retStr = buzzfeed.users[this.user_id][likeIndArr[0]].form +" "+ buzzfeed.ARTICLE_NAME + " and thinks it's "+ reactionArr
+              retStr = buzzfeed.users[this.user_id][likeIndArr[0]].form +" "+ buzzfeed.ARTICLE_NAME + " and thinks it's "+ reactionStr
             }
             //they just reacted to the article without liking
             else {
-              retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + reactionArr
+
+              retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + reactionStr
             }
-
-            //remove from the main reaction object to avoid duplicates
-
           }
           //only reacted once, find out what type it is
           else {
@@ -1833,19 +1835,63 @@ var buzzfeed = (function () {
             else {
               retStr = buzzfeed.users[this.user_id][0].form +" " + buzzfeed.ARTICLE_NAME
             }
-
-
           }
-
           return retStr
         }
-
-
       }
     };
 
     $('#reactions').render(buzzfeed.reactions, directives);
+    //$('#all').render(buzzfeed.commentArr, directives);
 
+
+    //since some of the blurbs have links, we can't take advantage of transparency's beautiful one-line render.
+    //Instead, interate through comments and render by hand if a link is included. =(
+    var subCommentCount=0;
+    _.each(buzzfeed.textComments, function (e, i, l) {
+
+      //add the comment HTML to the page, will need to operate on it either way.
+      var output = document.getElementById("comments");
+      var commentStr = "<div class='comment' id='comment' ></div>"
+      output.innerHTML =   output.innerHTML + commentStr
+      $('#comment').attr('id','comment'+i);
+      var output2 = document.getElementById("comment"+i);
+      output2.innerHTML =   output2.innerHTML + buzzfeed.innerCommentStr;
+
+      //link in blurb string, lets do it the hard way
+      if (e.blurb.indexOf("<a href=") != -1) {
+        console.log('have a link!')
+        buzzfeed.addLink(e.blurb, e)
+      }
+      //beautiful one line render
+      else {
+        $('#comment'+i).render(e);
+      }
+
+      //we have sub-comments to display, add the html and render them
+      if (e.children) {
+        _.each(e.children, function (e2, i2, l2) {
+          //since this is for the comments-only view, we want to check that the element is a comment
+          if (e2.form == "text") {
+            var commentStr = "<div class='subComment' id='subComment' ></div>"
+            output.innerHTML =   output.innerHTML + commentStr
+            $('#subComment').attr('id','subComment'+subCommentCount);
+            var output2 = document.getElementById("subComment"+subCommentCount);
+            output2.innerHTML =   output2.innerHTML + buzzfeed.innerCommentStr;
+            e2.blurb = cleanStrings(e2.blurb)
+            e2.humanDate = buzzfeed.humanizeDate(e2.f_raw)
+            e2.dateDiff = buzzfeed.dateDiff(e2.f_raw)
+            console.log(e2.blurb)
+            $('#subComment'+subCommentCount).render(e2);
+            subCommentCount++
+
+          } else {
+
+          }
+        })
+      }
+
+    });
 
   }
 
@@ -1867,7 +1913,35 @@ var buzzfeed = (function () {
         console.log("switchingError")
     }
   }
+  buzzfeed.addLink = function (str, e) {
 
+    var tagStart = str.search(/<[a-z][\s\S]*>/i);
+    var tagEnd = str.search(">");
+    var tag = str.slice(tagStart, tagEnd + 1);
+    var linkStart = tag.indexOf('"')
+    var linkEnd = tag.indexOf('"',linkStart+1)
+    var url = tag.slice(linkStart, linkEnd + 1);
+    var preURLStr = str.slice(0, tagStart-1)
+    var wordArr =preURLStr.split(' ')
+    var urlWord = wordArr[wordArr.length-1]
+    var startStr = preURLStr.replace(urlWord, "");
+    var endStr = str.slice(tagEnd+1)
+    $( "#blurb" ).append(startStr)
+    var re = new RegExp('"', 'g');
+    url = url.replace(re, "");
+    console.log(url)
+    var a = $('<a />');
+    a.attr('href',url);
+    a.text(urlWord);
+    $('#blurb').append(a);
+    $( "#blurb" ).append(" "+endStr)
+
+    $('#user_id').append(e.user_id);
+    $('#dateDiff').append(e.dateDiff);
+
+
+
+  }
 
 
   buzzfeed.humanizeDate = function (inDate) {
@@ -1921,6 +1995,10 @@ function contains(test, str) {
   }
 
 }
+function cleanStrings(inStr) {
+  return $('<textarea />').html(inStr).text();
+}
+
 
 
 

@@ -4,6 +4,14 @@
   margin-top: 10px;
 }
 
+.subComment {
+  font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
+  background-color: #bada55;
+  margin-top: 2px;
+  margin-bottom: 10px;
+  width: 95%
+}
+
 .userInfo {
    font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
    float: left;
