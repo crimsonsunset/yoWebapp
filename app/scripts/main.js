@@ -1680,9 +1680,8 @@ var buzzfeed = (function () {
   buzzfeed.imageReactions = []
   buzzfeed.users = {}
   buzzfeed.innerCommentStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
-  buzzfeed.lovesStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
-  buzzfeed.hatesStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
-
+  buzzfeed.innerCommentStrAll = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' ></div><div class='timestamp'></div></div><div class='blurb'></div>"
+  buzzfeed.innerReactionStr = "<div class='reaction' >  <div class='myId'></div>  <div class='userText'></div>  <div class='dateDiff'></div></div></div><div class='blurb' id='blurb'></div>"
 
   function init() {
     start();
@@ -1771,14 +1770,38 @@ var buzzfeed = (function () {
 
   buzzfeed.populateTabs = function (inTab) {
 
+
+    //mixed bag for the all tab, so we need to iterate to figure out which kind of comment we're dealing with, then handle it appropraitely
+    //_.each(buzzfeed.commentArr, function (e, i, l) {
+    //  if (e.comment_type == "badge_vote") {
+    //
+    //  } else if (e.form == "text"){
+    //
+    //    //add the comment HTML to the page, will need to operate on it either way.
+    //    var output = document.getElementById("all");
+    //    console.log(output)
+    //    var commentStr = "<div class='comment' id='commentAll' ></div>"
+    //    output.innerHTML =   output.innerHTML + commentStr
+    //    $('#commentAll').attr('id','commentAll'+i);
+    //    var output2 = document.getElementById("commentAll"+i);
+    //    output2.innerHTML =   output2.innerHTML + buzzfeed.innerCommentStr;
+    //    $('#commentAll'+i).render(e);
+    //
+    //  }
+    //  else {
+    //    //can ignore all these other types
+    //  }
+    //
+    //
+    //})
+
     var reactionInd=0;
-    var directives = {
+    var reactionDirectives = {
       myId: {
         text: function(params) {
           return "User " +this.user_id
         }
       },
-
       //heres the deal: if a user has multiple entries that means they have had several reactions
       //to the article. this will make their reaction output different than other users that
       //only had one. we will leverage the user object to gleam their entire response, then
@@ -1873,7 +1896,7 @@ var buzzfeed = (function () {
       }
     };
 
-    $('#reactions').render(buzzfeed.reactions, directives);
+    $('#reactions').render(buzzfeed.reactions, reactionDirectives);
 
 
     var reactionNodes = document.getElementsByClassName("userText");
@@ -1892,7 +1915,6 @@ var buzzfeed = (function () {
       "@@@old" : "<span class='badges'>old</span>",
       "@@@amazing" : "<span class='badges'>amazing</span>"
     }
-
     _.each(reactionNodes, function (e, i, l) {
       e.setAttribute("id", "userText"+i);
       var currHTML = $('#userText'+i).html()
@@ -1915,9 +1937,25 @@ var buzzfeed = (function () {
 
     })
 
+    spawnComments(false);
 
-    //$('#all').render(buzzfeed.commentArr, directives);
+  }
 
+  function spawnComments(onAllTab){
+
+    var currArr = []
+    var currContainer = ""
+    var currType = ""
+
+    if (onAllTab) {
+
+    } else {
+
+      currArr = buzzfeed.textComments
+      currContainer = "comments"
+      currType = "comment"
+
+    }
 
     //since some of the blurbs have links, we can't take advantage of transparency's beautiful one-line render.
     //Instead, interate through comments and render by hand if a link is included. =(
@@ -2015,7 +2053,6 @@ var buzzfeed = (function () {
 
 
   }
-
 
   buzzfeed.humanizeDate = function (inDate) {
     return moment(inDate).format('hh:mm A');
