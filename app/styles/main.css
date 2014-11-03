@@ -1,3 +1,4 @@
+/*comment-related classes*/
 .comment {
   font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
   background-color: #eee;
@@ -47,14 +48,33 @@
 
 }
 
+/*reactions-related classes*/
+.reaction {
+  border: 2px solid;
+  font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
+  margin-top: 10px;
+}
+
+
 .badges {
   font: bold 10px "Helvetica Neue",Arial,Helvetica,sans-serif;
   text-transform: uppercase;
-  color: #000;
-  background: #fe0;
+  color: black;
+  background: yellow;
   padding: 2px 4px;
   cursor: pointer;
 }
+
+.loves {
+}
+
+.hates {
+}
+
+.myId {
+  width: 200px;
+}
+
 
 
 

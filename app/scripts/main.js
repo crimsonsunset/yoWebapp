@@ -90,6 +90,18 @@ var buzzfeed = (function () {
       "user_id": "1752203"
     },
     {
+      "badge_title": "WIN",
+      "buzz_id": "3371338",
+      "form": "badge_vote",
+      "added": "1404216683",
+      "score": "0",
+      "f_raw": "2014-07-01 08:11:23",
+      "comment_type": "reaction",
+      "badge_id": "47",
+      "id": "13222246",
+      "user_id": "1752203"
+    },
+    {
       "badge_title": "OMG",
       "buzz_id": "3371338",
       "form": "badge_vote",
@@ -1668,6 +1680,8 @@ var buzzfeed = (function () {
   buzzfeed.imageReactions = []
   buzzfeed.users = {}
   buzzfeed.innerCommentStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
+  buzzfeed.lovesStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
+  buzzfeed.hatesStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='userId' id='user_id'></div><div class='timestamp' id='dateDiff'></div></div><div class='blurb' id='blurb'></div>"
 
 
   function init() {
@@ -1757,6 +1771,7 @@ var buzzfeed = (function () {
 
   buzzfeed.populateTabs = function (inTab) {
 
+    var reactionInd=0;
     var directives = {
       myId: {
         text: function(params) {
@@ -1768,6 +1783,8 @@ var buzzfeed = (function () {
       //to the article. this will make their reaction output different than other users that
       //only had one. we will leverage the user object to gleam their entire response, then
       //remove them from the reactionArr. This will prevent against duplicates
+      //additionally, we will tag the parts of the string that need to be updated.(using @@@)
+      // once they are rendered, will search for our @@@ breadcrumbs, and insert the appropriate html
       userText: {
         text: function(params) {
           var retStr="";
@@ -1795,20 +1812,35 @@ var buzzfeed = (function () {
               i++;
               return retVal;
             });
+
+            //add our @@@ identifiers to these badges
+            _.each(reactionArr, function (e, i, l) {
+              reactionArr[i] = "@@@"+e
+            });
             var reactionStr = String(reactionArr)
-            reactionStr = reactionStr.replace(/,/g , " & ");
+            console.log(reactionStr)
+            reactionStr = reactionStr.replace(/,/g , " , ");
+
+            //add ampersands for multiple reactions
+            if (reactionArr.length > 1) {
+              var lastInd = reactionStr.lastIndexOf(",")
+              reactionStr = reactionStr.replaceAt(lastInd, "&");
+            }
+
+
+            //Starting here, we're figuring out what type of string to return
 
             //loved and hated the article
             if(likeCount ==2){
               //1664046
               //just love and hate, no badge
               if (reactionArr.length == 0) {
-                retStr = buzzfeed.users[this.user_id][likeIndArr[0]].form +" & " + buzzfeed.users[this.user_id][likeIndArr[1]].form +" "+ buzzfeed.ARTICLE_NAME
+                retStr = "@@@"+buzzfeed.users[this.user_id][likeIndArr[0]].form +" & " + "@@@"+buzzfeed.users[this.user_id][likeIndArr[1]].form +" "+ buzzfeed.ARTICLE_NAME
               }
               //they have loved,hated, and badgevoted this article (overachievers)
               else {
                 for (var j = 0; j < likeIndArr.length; j++) {
-                  retStr += buzzfeed.users[this.user_id][likeIndArr[j]].form ;
+                  retStr += "@@@"+buzzfeed.users[this.user_id][likeIndArr[j]].form ;
                   var amp = (j == likeIndArr.length-2) ? " & " : ""
                   retStr+=amp
                 }
@@ -1817,31 +1849,73 @@ var buzzfeed = (function () {
             }
             //liked and reacted
             else if (likeCount ==1 && reactionArr.length != 0){
-              retStr = buzzfeed.users[this.user_id][likeIndArr[0]].form +" "+ buzzfeed.ARTICLE_NAME + " and thinks it's "+ reactionStr
+              retStr = "@@@"+buzzfeed.users[this.user_id][likeIndArr[0]].form +" "+ buzzfeed.ARTICLE_NAME + " and thinks it's "+ reactionStr
             }
             //they just reacted to the article without liking
             else {
-
               retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + reactionStr
             }
           }
           //only reacted once, find out what type it is
           else {
             if (buzzfeed.users[this.user_id][0].form == "badge_vote") {
-              retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is " + buzzfeed.users[this.user_id][0].badge_title
+              retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is @@@" +buzzfeed.users[this.user_id][0].badge_title
 
             }
             //they have only liked it
             else {
-              retStr = buzzfeed.users[this.user_id][0].form +" " + buzzfeed.ARTICLE_NAME
+              retStr = "@@@"+buzzfeed.users[this.user_id][0].form +" " + buzzfeed.ARTICLE_NAME
             }
           }
+          reactionInd++;
           return retStr
         }
       }
     };
 
     $('#reactions').render(buzzfeed.reactions, directives);
+
+
+    var reactionNodes = document.getElementsByClassName("userText");
+    buzzfeed.styleRefObj = {
+      "@@@loves" : "<img class='loves' src='img/love_small.png'>",
+      "@@@hates" : "<img class='hates' src='img/hate_small.png'>",
+      "@@@lol" : "<span class='badges'>LOL</span>",
+      "@@@win" : "<span class='badges'>win</span>",
+      "@@@fail" : "<span class='badges'>fail</span>",
+      "@@@omg" : "<span class='badges'>omg</span>",
+      "@@@cute" : "<span class='badges'>cute</span>",
+      "@@@wtf" : "<span class='badges'>wtf</span>",
+      "@@@trashy" : "<span class='badges'>trashy</span>",
+      "@@@yaas" : "<span class='badges'>yaas</span>",
+      "@@@ew" : "<span class='badges'>ew</span>",
+      "@@@old" : "<span class='badges'>old</span>",
+      "@@@amazing" : "<span class='badges'>amazing</span>"
+    }
+
+    _.each(reactionNodes, function (e, i, l) {
+      e.setAttribute("id", "userText"+i);
+      var currHTML = $('#userText'+i).html()
+      var wordArr = currHTML.split(" ")
+      var matchingIndexes = []
+      var currInd = 0;
+      var matchingWords = $.grep(wordArr, function(e) {
+        var retVal = (e.indexOf("@@@") != -1)
+        var d = (retVal) ? matchingIndexes.push(currInd) : $.noop()
+        currInd++;
+        return retVal
+      });
+
+      //replace the words with their corresponding html
+      _.each(matchingWords, function (e2, i2, l2) {
+        wordArr[matchingIndexes[i2]] = buzzfeed.styleRefObj[e2.toLowerCase()]
+      })
+      var updatedHTML = wordArr.join(" ");
+      $('#userText'+i).html(updatedHTML)
+
+    })
+
+
     //$('#all').render(buzzfeed.commentArr, directives);
 
 
@@ -1860,8 +1934,7 @@ var buzzfeed = (function () {
 
       //link in blurb string, lets do it the hard way
       if (e.blurb.indexOf("<a href=") != -1) {
-        console.log('have a link!')
-        buzzfeed.addLink(e.blurb, e)
+        buzzfeed.addLink(e)
       }
       //beautiful one line render
       else {
@@ -1881,7 +1954,7 @@ var buzzfeed = (function () {
             e2.blurb = cleanStrings(e2.blurb)
             e2.humanDate = buzzfeed.humanizeDate(e2.f_raw)
             e2.dateDiff = buzzfeed.dateDiff(e2.f_raw)
-            console.log(e2.blurb)
+
             $('#subComment'+subCommentCount).render(e2);
             subCommentCount++
 
@@ -1913,8 +1986,8 @@ var buzzfeed = (function () {
         console.log("switchingError")
     }
   }
-  buzzfeed.addLink = function (str, e) {
-
+  buzzfeed.addLink = function (e) {
+    var str = e.blurb
     var tagStart = str.search(/<[a-z][\s\S]*>/i);
     var tagEnd = str.search(">");
     var tag = str.slice(tagStart, tagEnd + 1);
@@ -1929,7 +2002,7 @@ var buzzfeed = (function () {
     $( "#blurb" ).append(startStr)
     var re = new RegExp('"', 'g');
     url = url.replace(re, "");
-    console.log(url)
+    //console.log(url)
     var a = $('<a />');
     a.attr('href',url);
     a.text(urlWord);
@@ -1963,6 +2036,10 @@ var buzzfeed = (function () {
 String.prototype.endsWith = function (suffix) {
   return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
+String.prototype.replaceAt=function(index, character) {
+  return this.substr(0, index) + character + this.substr(index+character.length);
+}
+
 Array.prototype.unique = function () {
   var a = this.concat();
   for (var i = 0; i < a.length; ++i) {
@@ -1974,6 +2051,7 @@ Array.prototype.unique = function () {
 
   return a;
 };
+
 
 //util functions
 var sort_by = function (field, reverse, primer) {

@@ -1,39 +1,10 @@
-<!DOCTYPE html>
-<html>
-<body>
-
-<p>Click the button to display the extracted part of the string.</p>
-
-<button onclick="myFunction()">Try it</button>
-
-<p id="demo"></p>
-
-<script>
-
-
-  var str = 'r degree too, as you can see on this <a href="https://www.ezlandlordforms.com/cost-to-rent-a-home/">map of ENDDDD'
-  var tagStart = str.search(/<[a-z][\s\S]*>/i);
-  var tagEnd = str.search(">");
-  var tag = str.slice(tagStart, tagEnd + 1);
-  var linkStart = tag.indexOf('"')
-  var linkEnd = tag.indexOf('"',linkStart+1)
-  var url = tag.slice(linkStart, linkEnd + 1);
-//  console.log(url)
-
-  var preURLStr = str.slice(0, tagStart-1)
-  var wordArr =preURLStr.split(' ')
-  var urlWord = wordArr[wordArr.length-1]
-  var urlWordStart = str.indexOf(urlWord)
-  var newStr = str.slice(urlWordStart, tagEnd + 1)
-
-  var removedStr = str.replace(tag, "");
-  var removedStr2 = str.replace(newStr, "");
-  var re = new RegExp('"', 'g');
-  url = url.replace(re, "");
-  console.log(url)
-
-
-</script>
-
-</body>
-</html>
+"@@@lol" : "<span class='badges'>LOL</span>",
+"@@@win" : "<span class='badges'>win</span>",
+"@@@fail" : "<span class='badges'>fail</span>",
+"@@@omg" : "<span class='badges'>omg</span>",
+"@@@cute" : "<span class='badges'>cute</span>",
+"@@@wtf" : "<span class='badges'>wtf</span>",
+"@@@trashy" : "<span class='badges'>trashy</span>",
+"@@@yaas" : "<span class='badges'>yaas</span>",
+"@@@ew" : "<span class='badges'>ew</span>",
+"@@@amazing" : "<span class='badges'>amazing</span>"
