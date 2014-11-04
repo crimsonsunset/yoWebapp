@@ -1,11 +1,11 @@
 /*comment-related classes*/
-.comment {
+.comment, .commentAll {
   font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
   background-color: #eee;
   margin-top: 10px;
 }
 
-.subComment {
+.subComment, .subCommentAll {
   font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
   background-color: #bada55;
   margin-top: 2px;
@@ -28,14 +28,14 @@
   width: 25px;
 }
 
-.userId {
+.user_id, .userId {
   float: bottom;
   margin-top: 10px;
   height: 16px;
   margin-left: 40px;
 }
 
-.timestamp {
+.timestamp, .dateDiff {
   height: 12px;
   margin-left: 40px;
   font-size: 10px;
