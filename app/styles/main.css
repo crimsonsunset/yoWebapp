@@ -7,7 +7,7 @@
 
 .subComment, .subCommentAll {
   font: 12px "Lucida Grande",Tahoma,Verdana,sans-serif;
-  background-color: #bada55;
+  background-color: #f3f3f3;
   margin-top: 2px;
   margin-bottom: 10px;
   margin-left: 15px;
@@ -31,33 +31,52 @@
 
 .user_id, .userId {
   float: bottom;
+  color: #07e;
+  font-weight: bold;
+  font: 12px ProximaNovaRegular,arial,helvetica,sans-serif;
   margin-top: 10px;
   height: 16px;
   margin-left: 40px;
 }
 
 /*datediffforcomments*/
-/*.timestamp, .dateDiff {*/
-  /*height: 12px;*/
-  /*margin-left: 40px;*/
-  /*font-size: 10px;*/
-/*}*/
+.dateDiffCommentAll, .dateDiffComment {
+  height: 12px;
+  margin-left: 40px;
+  font-size: 10px;
+}
 
 
 .blurb {
   margin-left: 10px;
-  font-size: 16px;
+  font-size: 14px;
   padding-bottom: 15px;
 
 }
 
-
+#nextPageBtn{
+  margin: 5px;
+  border: 1px solid lightgray;
+  line-height: 2;
+  font-weight: bold;
+  padding: 5px 14px;
+  font-size: 14px;
+  background-color: #eee;
+}
 
 /*reactions-related classes*/
 .reaction, .reactionAll {
   /*border: 2px solid;*/
   padding-top: 5px;
   height: 30px;
+}
+
+.articleName {
+  max-width: 210px;
+  float: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
@@ -81,7 +100,7 @@
   float: left;
   color: #07e;
   font-weight: bold;
-  font: 12px "Arial",Tahoma,Verdana,sans-serif;
+  font: 12px ProximaNovaRegular,arial,helvetica,sans-serif;
   width: auto;
 }
 
