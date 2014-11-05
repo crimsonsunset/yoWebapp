@@ -10,7 +10,7 @@ $(document).ready(function () {
 
 //the API URL to GET from
 var url = "http://www.buzzfeed.com/buzzfeed/api/comments?buzz_id="
-var buzz_id = "3371338"
+var buzz_id = "3494459"
 
 
 var buzzfeed = (function () {
@@ -24,21 +24,21 @@ var buzzfeed = (function () {
   //main datastores for this class
   buzzfeed.commentArr = []
   buzzfeed.styleRefObj = {
-    "@@@loves" : "<img class='loves' src='img/love_small.png'>",
-    "@@@hates" : "<img class='hates' src='img/hate_small.png'>",
-    "@@@lol" : "<span class='badges'>LOL</span>",
-    "@@@win" : "<span class='badges'>win</span>",
-    "@@@fail" : "<span class='badges'>fail</span>",
-    "@@@omg" : "<span class='badges'>omg</span>",
-    "@@@cute" : "<span class='badges'>cute</span>",
-    "@@@wtf" : "<span class='badges'>wtf</span>",
-    "@@@trashy" : "<span class='badges'>trashy</span>",
-    "@@@yaas" : "<span class='badges'>yaas</span>",
-    "@@@Yaaass" : "<span class='badges'>Yaaass</span>",
-    "@@@ew" : "<span class='badges'>ew</span>",
-    "@@@old" : "<span class='badges'>old</span>",
-    "@@@bold" : "<span class='badges'>bold</span>",
-    "@@@amazing" : "<span class='badges'>amazing</span>"
+    "@@@loves": "<img class='loves' src='img/love_small.png'>",
+    "@@@hates": "<img class='hates' src='img/hate_small.png'>",
+    "@@@lol": "<span class='badges'>LOL</span>",
+    "@@@win": "<span class='badges'>win</span>",
+    "@@@fail": "<span class='badges'>fail</span>",
+    "@@@omg": "<span class='badges'>omg</span>",
+    "@@@cute": "<span class='badges'>cute</span>",
+    "@@@wtf": "<span class='badges'>wtf</span>",
+    "@@@trashy": "<span class='badges'>trashy</span>",
+    "@@@yaas": "<span class='badges'>yaas</span>",
+    "@@@Yaaass": "<span class='badges'>Yaaass</span>",
+    "@@@ew": "<span class='badges'>ew</span>",
+    "@@@old": "<span class='badges'>old</span>",
+    "@@@bold": "<span class='badges'>bold</span>",
+    "@@@amazing": "<span class='badges'>amazing</span>"
   }
   buzzfeed.commentCount = 132
   buzzfeed.textComments = []
@@ -57,9 +57,14 @@ var buzzfeed = (function () {
   buzzfeed.innerReactionStrAll = "<div class='reactionAll' >  <div class='myId'></div>  <div class='userTextAll'></div>  <div class='dateDiff'></div></div>"
 
   //arrays to store the items in the pages that overflow
-  buzzfeed.allPages=[]
-  buzzfeed.commentPages=[]
-  buzzfeed.reactionPages=[]
+  buzzfeed.allPages = []
+  buzzfeed.commentPages = []
+  buzzfeed.reactionPages = []
+
+  //objects that will store pages at a time
+  buzzfeed.allPagesObj = {}
+  buzzfeed.commentPagesObj = {}
+  buzzfeed.reactionPagesObj = {}
 
   buzzfeed.highchartsConfig = {
     chart: {
@@ -109,8 +114,7 @@ var buzzfeed = (function () {
       lineWidth: 0,
       gridLineColor: "#F5f5f5",
       gridLineWidth: 0,
-      categories: [
-      ]
+      categories: []
     },
     yAxis: {
       tickColor: 'E0E0E0',
@@ -126,8 +130,7 @@ var buzzfeed = (function () {
         display: "none"
       },
 
-      labels:
-      {
+      labels: {
         enabled: false
       }
     },
@@ -155,24 +158,23 @@ var buzzfeed = (function () {
    */
   buzzfeed.start = function () {
 
-    $.ajax( {
-      url: url+buzz_id,
+    $.ajax({
+      url: url + buzz_id,
       async: false,
       type: "GET"
-    } )
-      .done(function(data) {
+    })
+      .done(function (data) {
         console.log("success")
         buzzfeed.commentArr = data.comments
         buzzfeed.commentCount = data.count
         buzzfeed.separateCommentTypes();
       })
-      .fail(function() {
-        console.log( "error" );
+      .fail(function () {
+        console.log("error");
       })
-      .always(function() {
+      .always(function () {
         //alert( "complete" );
       });
-
 
 
   }
@@ -184,6 +186,14 @@ var buzzfeed = (function () {
    */
   buzzfeed.separateCommentTypes = function () {
 
+
+    buzzfeed.textTally = 0
+    buzzfeed.reactionTally = 0
+    buzzfeed.allTally = 0
+
+    buzzfeed.currTextPage = 0
+    buzzfeed.currReactionPage = 0
+    buzzfeed.currAllPage = 0
 
     //separate comments into two main types for this exercise: text comments and reactions
     _.each(buzzfeed.commentArr, function (e, i, l) {
@@ -197,6 +207,20 @@ var buzzfeed = (function () {
       if (e.form == "text") {
         e.blurb = cleanStrings(e.blurb)
         buzzfeed.textComments.push(e)
+
+        //populate the page object
+        if (!buzzfeed.commentPagesObj[buzzfeed.currTextPage]) {
+          buzzfeed.commentPagesObj[buzzfeed.currTextPage] = []
+        } else {
+          if (buzzfeed.commentPagesObj[buzzfeed.currTextPage].length == buzzfeed.DISPLAY_NUM) {
+            buzzfeed.currTextPage++
+            buzzfeed.commentPagesObj[buzzfeed.currTextPage] = []
+          } else {
+          }
+        }
+        buzzfeed.commentPagesObj[buzzfeed.currTextPage].push(e)
+        addToAllPages(e)
+
       }
       //get those bots outta here
       else if (e.form == "link-traffic") {
@@ -214,6 +238,16 @@ var buzzfeed = (function () {
       else {
         //use this for loop to count different badges, will be displayed in chart form later
 
+        if (!buzzfeed.reactionPagesObj[buzzfeed.currReactionPage]) {
+          buzzfeed.reactionPagesObj[buzzfeed.currReactionPage] = []
+        } else {
+          if (buzzfeed.reactionPagesObj[buzzfeed.currReactionPage].length == buzzfeed.DISPLAY_NUM) {
+            buzzfeed.currReactionPage++
+            buzzfeed.reactionPagesObj[buzzfeed.currReactionPage] = []
+          } else {
+          }
+        }
+
 
         //need to check if user had more than one reaction to post, will be used later to populate
         //their reactions output accordingly.
@@ -222,6 +256,7 @@ var buzzfeed = (function () {
           buzzfeed.users[e.user_id].push(e)
           //only add to the reaction array the first time, will use the users object as reference later
           buzzfeed.reactions.push(e)
+          buzzfeed.reactionPagesObj[buzzfeed.currReactionPage].push(e)
         } else {
           buzzfeed.users[e.user_id].push(e)
         }
@@ -237,22 +272,38 @@ var buzzfeed = (function () {
         } else {
           buzzfeed.reactionTallies[e.badge_title].total++
         }
+        addToAllPages(e)
+
       }
 
     });
 
+    function addToAllPages(e){
+
+      if (!buzzfeed.allPagesObj[buzzfeed.currAllPage]) {
+        buzzfeed.allPagesObj[buzzfeed.currAllPage] = []
+      } else {
+        if (buzzfeed.allPagesObj[buzzfeed.currAllPage].length == buzzfeed.DISPLAY_NUM) {
+          buzzfeed.currAllPage++
+          buzzfeed.allPagesObj[buzzfeed.currAllPage] = []
+        } else {
+        }
+      }
+      buzzfeed.allPagesObj[buzzfeed.currAllPage].push(e)
+    }
+
     //tag the name of the article for adding style once reactions are rendered
     var titleArr = buzzfeed.ARTICLE_NAME.split(" ")
 
-    var newTitle="";
+    var newTitle = "";
     _.each(titleArr, function (e, i, l) {
-      newTitle+= "###"+e+ " "
+      newTitle += "###" + e + " "
     })
     buzzfeed.ARTICLE_NAME = newTitle
 
     //now that the datastores are populated, can use this data to render the tabs and the highchart
     buzzfeed.populateTabs();
-    buzzfeed.spawnHighchart();
+    //buzzfeed.spawnHighchart();
 
 
   }
@@ -262,10 +313,69 @@ var buzzfeed = (function () {
    */
   buzzfeed.populateTabs = function () {
 
+    //ALL TAB
+
+    //mixed bag for the all tab, so we need to iterate to figure out
+    // which kind of comment we're dealing with, then handle it appropriately
+    buzzfeed.allCommentCount = 0;
+    subCommentCount = 0;
+    buzzfeed.onAllTab = true;
+    buzzfeed.renderedUsers = {}
+
+    //iterate through all the response objects, spawning and rendering as need be
+    //_.each(buzzfeed.commentArr, function (e, i, l) {
+    //  var currCommentId = ""
+    //
+    //  if (e.form == "badge_vote" || e.form == "loves" || e.form == "hates") {
+    //
+    //    //already rendered this users info, skip over them
+    //    if (buzzfeed.renderedUsers[e.user_id]) {
+    //
+    //    }
+    //    //they're new to the party, put their info on the page
+    //    else {
+    //      buzzfeed.allCommentCount++;
+    //      buzzfeed.renderedUsers[e.user_id] = true;
+    //      var output = document.getElementById("all");
+    //      var reactionStr = "<div class='reactionAll' id='reactionAll' ></div>"
+    //      output.innerHTML = output.innerHTML + reactionStr
+    //      $('#reactionAll').attr('id', "reactionAll" + i);
+    //      var output2 = document.getElementById("reactionAll" + i);
+    //      output2.innerHTML = output2.innerHTML + buzzfeed.innerReactionStrAll;
+    //      reactionIndAll = 0
+    //      currCommentId = 'reactionAll' + i
+    //      $('#reactionAll' + i).render(e, reactionDirectives);
+    //    }
+    //
+    //  } else if (e.form == "text") {
+    //    buzzfeed.allCommentCount++;
+    //    _.each([e], buzzfeed.spawnComment, this);
+    //    currCommentId = "commentAll" + buzzfeed.allCommentCount
+    //  }
+    //  else {
+    //    //can ignore all these other types
+    //  }
+    //
+    //  //have reached our page limit, hide these until user clicks button
+    //  if (buzzfeed.allCommentCount > buzzfeed.DISPLAY_NUM && currCommentId != "") {
+    //    $("#" + currCommentId).hide()
+    //    buzzfeed.allPages.push(currCommentId)
+    //  } else {
+    //  }
+    //
+    //})
+    //buzzfeed.stylizeReactionText();
+
+
+    //done with all tab, now flip our operational boolean
+    buzzfeed.onAllTab = false;
+
+    //REACTION TAB
+
     var reactionDirectives = {
       myId: {
-        text: function(params) {
-          return "User " +this.user_id
+        text: function (params) {
+          return "User " + this.user_id
         }
       },
       //heres the deal: if a user has multiple entries that means they have had several reactions
@@ -282,66 +392,8 @@ var buzzfeed = (function () {
       }
     };
 
-    //ALL TAB
-
-    //mixed bag for the all tab, so we need to iterate to figure out
-    // which kind of comment we're dealing with, then handle it appropriately
-    buzzfeed.allCommentCount=0;
-    subCommentCount=0;
-    buzzfeed.onAllTab = true;
-    buzzfeed.renderedUsers={}
-
-    //iterate through all the response objects, spawning and rendering as need be
-    _.each(buzzfeed.commentArr, function (e, i, l) {
-      var currCommentId = ""
-
-      if (e.form == "badge_vote" || e.form == "loves" || e.form == "hates") {
-
-        //already rendered this users info, skip over them
-        if (buzzfeed.renderedUsers[e.user_id]) {
-
-        }
-        //they're new to the party, put their info on the page
-        else {
-          buzzfeed.allCommentCount++;
-          buzzfeed.renderedUsers[e.user_id] = true;
-          var output = document.getElementById("all");
-          var reactionStr = "<div class='reactionAll' id='reactionAll' ></div>"
-          output.innerHTML =   output.innerHTML + reactionStr
-          $('#reactionAll').attr('id',"reactionAll"+i);
-          var output2 = document.getElementById("reactionAll"+i);
-          output2.innerHTML =   output2.innerHTML + buzzfeed.innerReactionStrAll;
-          reactionIndAll=0
-          currCommentId = 'reactionAll'+i
-          $('#reactionAll'+i).render(e, reactionDirectives);
-        }
-
-      } else if (e.form == "text"){
-        buzzfeed.allCommentCount++;
-        _.each([e], buzzfeed.spawnComment, this);
-        currCommentId = "commentAll"+buzzfeed.allCommentCount
-      }
-      else {
-        //can ignore all these other types
-      }
-
-      //have reached our page limit, hide these until user clicks button
-      if (buzzfeed.allCommentCount > buzzfeed.DISPLAY_NUM && currCommentId != "") {
-        $("#"+currCommentId).hide()
-        buzzfeed.allPages.push(currCommentId)
-      } else {}
-
-    })
-    buzzfeed.stylizeReactionText();
-
-
-    //done with all tab, now flip our operational boolean
-    buzzfeed.onAllTab = false;
-
-    //REACTION TAB
-
-    reactionInd=0;
-    $('#reactions').render(buzzfeed.reactions, reactionDirectives);
+    reactionInd = 0;
+    $('#reactions').render(buzzfeed.reactionPagesObj[0], reactionDirectives);
     //once the reactions are rendered with plain text using transparency.js, we need to
     //replace the specially tagged strings with the corresponding html classes
     buzzfeed.stylizeReactionText();
@@ -350,7 +402,7 @@ var buzzfeed = (function () {
 
     //since some of the blurbs have links, we can't take advantage of transparency's beautiful one-line render.
     //Instead, iterate through comments and render by hand if a link is included. =(
-    subCommentCount=0;
+    subCommentCount = 0;
     _.each(buzzfeed.textComments, buzzfeed.spawnComment, this);
 
   }
@@ -361,23 +413,23 @@ var buzzfeed = (function () {
    * Leverages the userArr to suss out how to display a given reaction.
    * If a user has reacted more than once, this function will combine them appropriately
    */
-  buzzfeed.parseReactionText = function(){
+  buzzfeed.parseReactionText = function () {
 
-    var retStr="";
+    var retStr = "";
 
     //a user has reacted more than once
     if (buzzfeed.users[this.user_id].length > 1) {
 
-      var likeCount=0;
-      var reactionArr=[];
-      var i=0;
+      var likeCount = 0;
+      var reactionArr = [];
+      var i = 0;
       var likeIndArr = []
       var userId = this.user_id
 
 
       //check if one of the reactions is a loves or hates type
-      $.grep(buzzfeed.users[this.user_id], function(e){
-        var retVal = ((e.form == "hates" )||( e.form == "loves") )
+      $.grep(buzzfeed.users[this.user_id], function (e) {
+        var retVal = ((e.form == "hates" ) || ( e.form == "loves") )
         if (retVal) {
           likeIndArr.push(i)
           likeCount++
@@ -390,10 +442,10 @@ var buzzfeed = (function () {
 
       //add our @@@ identifiers to these badges
       _.each(reactionArr, function (e, i, l) {
-        reactionArr[i] = "@@@"+e
+        reactionArr[i] = "@@@" + e
       });
       var reactionStr = String(reactionArr)
-      reactionStr = reactionStr.replace(/,/g , " , ");
+      reactionStr = reactionStr.replace(/,/g, " , ");
 
       //add ampersands for multiple reactions
       if (reactionArr.length > 1) {
@@ -405,25 +457,25 @@ var buzzfeed = (function () {
       //Starting here, we're figuring out what type of string to return
 
       //loved and hated the article
-      if(likeCount ==2){
+      if (likeCount == 2) {
         //1664046
         //just love and hate, no badge
         if (reactionArr.length == 0) {
-          retStr = "@@@"+buzzfeed.users[this.user_id][likeIndArr[0]].form +" & " + "@@@"+buzzfeed.users[this.user_id][likeIndArr[1]].form +" "+ buzzfeed.ARTICLE_NAME
+          retStr = "@@@" + buzzfeed.users[this.user_id][likeIndArr[0]].form + " & " + "@@@" + buzzfeed.users[this.user_id][likeIndArr[1]].form + " " + buzzfeed.ARTICLE_NAME
         }
         //they have loved,hated, and badgevoted this article (overachievers)
         else {
           for (var j = 0; j < likeIndArr.length; j++) {
-            retStr += "@@@"+buzzfeed.users[this.user_id][likeIndArr[j]].form ;
-            var amp = (j == likeIndArr.length-2) ? " & " : ""
-            retStr+=amp
+            retStr += "@@@" + buzzfeed.users[this.user_id][likeIndArr[j]].form;
+            var amp = (j == likeIndArr.length - 2) ? " & " : ""
+            retStr += amp
           }
-          retStr += " and thinks it's "+ reactionStr
+          retStr += " and thinks it's " + reactionStr
         }
       }
       //liked and reacted
-      else if (likeCount ==1 && reactionArr.length != 0){
-        retStr = "@@@"+buzzfeed.users[this.user_id][likeIndArr[0]].form +" "+ buzzfeed.ARTICLE_NAME + " and thinks it's "+ reactionStr
+      else if (likeCount == 1 && reactionArr.length != 0) {
+        retStr = "@@@" + buzzfeed.users[this.user_id][likeIndArr[0]].form + " " + buzzfeed.ARTICLE_NAME + " and thinks it's " + reactionStr
       }
       //they just reacted to the article without liking
       else {
@@ -433,11 +485,11 @@ var buzzfeed = (function () {
     //only reacted once, find out what type it is
     else {
       if (buzzfeed.users[this.user_id][0].form == "badge_vote") {
-        retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is @@@" +buzzfeed.users[this.user_id][0].badge_title
+        retStr = "thinks " + buzzfeed.ARTICLE_NAME + " is @@@" + buzzfeed.users[this.user_id][0].badge_title
       }
       //they have only liked it
       else {
-        retStr = "@@@"+buzzfeed.users[this.user_id][0].form +" " + buzzfeed.ARTICLE_NAME
+        retStr = "@@@" + buzzfeed.users[this.user_id][0].form + " " + buzzfeed.ARTICLE_NAME
       }
     }
     (buzzfeed.onAllTab) ? reactionIndAll++ : reactionInd++
@@ -450,7 +502,7 @@ var buzzfeed = (function () {
    * Searches for tagged plain text in the rendered HTML
    * and replaces it with the corresponding html tags
    */
-  buzzfeed.stylizeReactionText = function(){
+  buzzfeed.stylizeReactionText = function () {
 
     var currText = ""
     var currReaction = ""
@@ -471,16 +523,16 @@ var buzzfeed = (function () {
     var fullReactionNodes = document.getElementsByClassName(currReaction);
 
     _.each(reactionNodes, function (e, i, l) {
-      e.setAttribute("id", currText+i);
-      fullReactionNodes[i].setAttribute("id", currReaction+i);
-      var currHTML = $('#'+currText+i).html()
+      e.setAttribute("id", currText + i);
+      fullReactionNodes[i].setAttribute("id", currReaction + i);
+      var currHTML = $('#' + currText + i).html()
       var wordArr = currHTML.split(" ")
       var matchingIndexes = []
       var currInd = 0;
 
       //find our tagged words, get their indexes so they can be replaced with
       //corresponding html tags
-      var matchingWords = $.grep(wordArr, function(e) {
+      var matchingWords = $.grep(wordArr, function (e) {
         var retVal = (e.indexOf("@@@") != -1)
         var d = (retVal) ? matchingIndexes.push(currInd) : $.noop()
         currInd++;
@@ -488,7 +540,7 @@ var buzzfeed = (function () {
       });
 
       //same goes for title
-      var titleWords = $.grep(wordArr, function(e) {
+      var titleWords = $.grep(wordArr, function (e) {
         var retVal = (e.indexOf("###") != -1)
         return retVal
       });
@@ -497,7 +549,7 @@ var buzzfeed = (function () {
       var re = new RegExp("###", 'g');
       title = title.replace(re, '');
 
-      var titleSpan = "<div class='articleName'>"+title+"</div>"
+      var titleSpan = "<div class='articleName'>" + title + "</div>"
 
 
       //replace the words with their corresponding html
@@ -506,14 +558,15 @@ var buzzfeed = (function () {
       })
       var updatedHTML = wordArr.join(" ");
       updatedHTML = updatedHTML.replace(buzzfeed.ARTICLE_NAME, titleSpan);
-      $('#'+currText+i).html(updatedHTML)
+      $('#' + currText + i).html(updatedHTML)
 
 
       //paging support
       if (!buzzfeed.onAllTab && i > buzzfeed.DISPLAY_NUM) {
-        $("#"+currReaction+i).hide()
-        buzzfeed.reactionPages.push(currReaction+i)
-      } else {}
+        $("#" + currReaction + i).hide()
+        buzzfeed.reactionPages.push(currReaction + i)
+      } else {
+      }
 
     })
 
@@ -523,7 +576,7 @@ var buzzfeed = (function () {
    * The comment rendering function. Used in conjunction with a for loop because blurbs that
    * contain links must be handled manually
    */
-  buzzfeed.spawnComment= function (e,i,l){
+  buzzfeed.spawnComment = function (e, i, l) {
 
     var currContainer = ""
     var currType = ""
@@ -548,11 +601,11 @@ var buzzfeed = (function () {
 
     //add the comment HTML to the page, will need to operate on it either way.
     var output = document.getElementById(currContainer);
-    var commentStr = "<div class='"+currType+"' id='"+currType+"' ></div>"
-    output.innerHTML =   output.innerHTML + commentStr
-    $('#'+currType).attr('id',currType+i);
-    var output2 = document.getElementById(currType+i);
-    output2.innerHTML =   output2.innerHTML + innerCommentStr;
+    var commentStr = "<div class='" + currType + "' id='" + currType + "' ></div>"
+    output.innerHTML = output.innerHTML + commentStr
+    $('#' + currType).attr('id', currType + i);
+    var output2 = document.getElementById(currType + i);
+    output2.innerHTML = output2.innerHTML + innerCommentStr;
 
     //link in blurb string, lets do it the hard way
     if (e.blurb.indexOf("<a href=") != -1) {
@@ -560,7 +613,7 @@ var buzzfeed = (function () {
     }
     //beautiful one line render
     else {
-      $('#'+currType+i).render(e);
+      $('#' + currType + i).render(e);
     }
 
     //we have sub-comments to display, add the html and render them
@@ -568,17 +621,17 @@ var buzzfeed = (function () {
       _.each(e.children, function (e2, i2, l2) {
         //since this is for the comments-only view, we want to check that the element is a comment
         if (e2.form == "text") {
-          var commentStr = "<div class='"+subCommentType+"' id='"+subCommentType+"' ></div>"
-          output.innerHTML =   output.innerHTML + commentStr
-          $('#'+subCommentType).attr('id',subCommentType+subCommentCount);
-          var output2 = document.getElementById(subCommentType+subCommentCount);
-          output2.innerHTML =   output2.innerHTML + innerCommentStr;
+          var commentStr = "<div class='" + subCommentType + "' id='" + subCommentType + "' ></div>"
+          output.innerHTML = output.innerHTML + commentStr
+          $('#' + subCommentType).attr('id', subCommentType + subCommentCount);
+          var output2 = document.getElementById(subCommentType + subCommentCount);
+          output2.innerHTML = output2.innerHTML + innerCommentStr;
           e2.blurb = cleanStrings(e2.blurb)
           e2.humanDate = buzzfeed.humanizeDate(e2.f_raw)
           e2.dateDiff = buzzfeed.dateDiff(e2.f_raw)
           e2.dateDiffComment = buzzfeed.dateDiff(e2.f_raw)
 
-          $('#'+subCommentType+subCommentCount).render(e2);
+          $('#' + subCommentType + subCommentCount).render(e2);
           subCommentCount++
 
         } else {
@@ -589,9 +642,10 @@ var buzzfeed = (function () {
 
     //paging support
     if (!buzzfeed.onAllTab && i > buzzfeed.DISPLAY_NUM) {
-      $("#"+currType+i).hide()
-      buzzfeed.commentPages.push(currType+i)
-    } else {}
+      $("#" + currType + i).hide()
+      buzzfeed.commentPages.push(currType + i)
+    } else {
+    }
 
   }
 
@@ -624,26 +678,25 @@ var buzzfeed = (function () {
     var tagEnd = str.search(">");
     var tag = str.slice(tagStart, tagEnd + 1);
     var linkStart = tag.indexOf('"')
-    var linkEnd = tag.indexOf('"',linkStart+1)
+    var linkEnd = tag.indexOf('"', linkStart + 1)
     var url = tag.slice(linkStart, linkEnd + 1);
-    var preURLStr = str.slice(0, tagStart-1)
-    var wordArr =preURLStr.split(' ')
-    var urlWord = wordArr[wordArr.length-1]
+    var preURLStr = str.slice(0, tagStart - 1)
+    var wordArr = preURLStr.split(' ')
+    var urlWord = wordArr[wordArr.length - 1]
     var startStr = preURLStr.replace(urlWord, "");
-    var endStr = str.slice(tagEnd+1)
-    $( "#"+blurbId ).append(startStr)
+    var endStr = str.slice(tagEnd + 1)
+    $("#" + blurbId).append(startStr)
     var re = new RegExp('"', 'g');
     url = url.replace(re, "");
     //console.log(url)
     var a = $('<a />');
-    a.attr('href',url);
+    a.attr('href', url);
     a.text(urlWord);
-    $('#'+blurbId).append(a);
-    $( "#"+blurbId ).append(" "+endStr)
+    $('#' + blurbId).append(a);
+    $("#" + blurbId).append(" " + endStr)
 
-    $('#'+userId).append(e.user_id);
-    $('#'+dateDiffId).append(e.dateDiff);
-
+    $('#' + userId).append(e.user_id);
+    $('#' + dateDiffId).append(e.dateDiff);
 
 
   }
@@ -654,15 +707,15 @@ var buzzfeed = (function () {
   buzzfeed.spawnHighchart = function () {
 
     //prepare the data for insertion into the highcharts object
-    var reactionTallyArr=[]
+    var reactionTallyArr = []
     _.each(buzzfeed.reactionTallies, function (e, i, l) {
       reactionTallyArr.push(e)
     })
     reactionTallyArr.sort(sort_by('total', false, function (a) {
       return a
     }));
-    var orderedBadges=[]
-    var orderedTallies=[]
+    var orderedBadges = []
+    var orderedTallies = []
     _.each(reactionTallyArr, function (e, i, l) {
       orderedBadges.push(e.title.toUpperCase())
       orderedTallies.push(e.total)
@@ -695,7 +748,7 @@ var buzzfeed = (function () {
         buzzfeed.currTab = "reaction"
         break;
     }
-    if (buzzfeed[buzzfeed.currTab+"Pages"].length > 0) {
+    if (buzzfeed[buzzfeed.currTab + "Pages"].length > 0) {
       $("#nextPageBtn").show()
 
     } else {
@@ -711,17 +764,17 @@ var buzzfeed = (function () {
 
     //show the next chunk of comments
     for (var i = 0; i < buzzfeed.DISPLAY_NUM; i++) {
-      if (buzzfeed[buzzfeed.currTab+"Pages"][i]) {
+      if (buzzfeed[buzzfeed.currTab + "Pages"][i]) {
         //console.log("showing " + buzzfeed[buzzfeed.currTab+"Pages"][i])
-        $("#"+buzzfeed[buzzfeed.currTab+"Pages"][i]).show()
-        buzzfeed[buzzfeed.currTab+"Pages"].shift()
+        $("#" + buzzfeed[buzzfeed.currTab + "Pages"][i]).show()
+        buzzfeed[buzzfeed.currTab + "Pages"].shift()
         i--
       } else {
         break
       }
     }
     //theres still more comments to see, still need the button
-    if (buzzfeed[buzzfeed.currTab+"Pages"].length > 0) {
+    if (buzzfeed[buzzfeed.currTab + "Pages"].length > 0) {
       $("#nextPageBtn").show()
     }
     //no comments left, can kill the button
@@ -755,15 +808,15 @@ var buzzfeed = (function () {
     //the fromNow method gets us close to buzzfeed's requirements, but not exactly.
     //use this switch to handle the cases it doesn't
     switch (humanDate) {
-      case contains(String(humanDate),"seconds"):
+      case contains(String(humanDate), "seconds"):
         humanDate = "just now"
         break;
       //minutes ago
-      case (contains(String(humanDate),"minute")&& contains(String(humanDate),"s")):
+      case (contains(String(humanDate), "minute") && contains(String(humanDate), "s")):
         humanDate = morphTimeString(humanDate)
         break;
       //minute ago
-      case (contains(String(humanDate),"minute")):
+      case (contains(String(humanDate), "minute")):
         humanDate = "just now"
         break;
     }
@@ -773,14 +826,14 @@ var buzzfeed = (function () {
      * BuzzFeed-specific timestamps
      * @param inStr the time string to be further manipulated
      */
-    function morphTimeString(inStr){
+    function morphTimeString(inStr) {
       var retStr;
 
       //anything less than 15 is called a few
       if (parseInt(inStr) < 15) {
         retStr = "just now"
 
-      } else if (parseInt(inStr) > 15 && parseInt(inStr) < 23){
+      } else if (parseInt(inStr) > 15 && parseInt(inStr) < 23) {
         retStr = "about 15 minutes ago"
       }
       //minutes ago
@@ -789,6 +842,7 @@ var buzzfeed = (function () {
       }
       return retStr
     }
+
     return humanDate
 
   }
@@ -804,8 +858,8 @@ var buzzfeed = (function () {
  * BuzzFeed-specific timestamps
  * @param inStr the time string to be further manipulated
  */
-String.prototype.replaceAt=function(index, character) {
-  return this.substr(0, index) + character + this.substr(index+character.length);
+String.prototype.replaceAt = function (index, character) {
+  return this.substr(0, index) + character + this.substr(index + character.length);
 }
 
 //util functions
