@@ -10,14 +10,15 @@ $(document).ready(function () {
 
 //the API URL to GET from
 var url = "http://www.buzzfeed.com/buzzfeed/api/comments?buzz_id="
-var buzz_id = "3371338"
+var buzz_id = "3494459"
 
 var buzzfeed = (function () {
   var buzzfeed = {}
 
   //Constants
+  //number of comments to load per page
   buzzfeed.DISPLAY_NUM = 100
-  //this would come in dynamically
+  //this would come in dynamically (presumably through a different api call)
   buzzfeed.ARTICLE_NAME = "Here Are The Cities Where The Rent Really Is Too Damn High"
 
   //main datastores for this class
@@ -39,7 +40,7 @@ var buzzfeed = (function () {
 
   //html strings that will be dynamically inserted depending on the tab
   buzzfeed.innerCommentStr = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='user_id' id='user_id'></div><div class='dateDiffComment' id='dateDiffComment'></div></div><div class='blurb' id='blurb'></div>"
-  buzzfeed.innerCommentStrAll = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='user_id' id='user_idAll'></div><div class='dateDiffComment' id='dateDiffComment'></div></div><div class='blurb' id='blurbAll'></div>"
+  buzzfeed.innerCommentStrAll = "<div class='userInfo' ><img class='userImg' src='img/user.jpg'><div class='user_id' id='user_idAll'></div><div class='dateDiffCommentAll' id='dateDiffCommentAll'></div></div><div class='blurb' id='blurbAll'></div>"
   buzzfeed.innerReactionStr = "<div class='reaction' >  <div class='myId'></div>  <div class='userText'></div>  <div class='dateDiff'></div></div>"
   buzzfeed.innerReactionStrAll = " <div class='myId'></div>  <div class='userTextAll'></div>  <div class='dateDiff'></div>"
   buzzfeed.outerReactionStr = "<div class='reaction' ><div class='myId'></div><div class='userText'></div><div class='dateDiff'></div></div>"
@@ -159,7 +160,7 @@ var buzzfeed = (function () {
       type: "GET"
     })
       .done(function (data) {
-        console.log("success")
+        console.log("API GET Successful")
         buzzfeed.commentArr = data.comments
         buzzfeed.commentCount = data.count
         buzzfeed.separateCommentTypes();
@@ -293,16 +294,16 @@ var buzzfeed = (function () {
     buzzfeed.currAllPage = 0
 
     //now that the datastores are populated, can use them to render the tabs and the highchart
-
-
     subCommentCount = 0;
     subCommentCountAll = 0;
     buzzfeed.allCommentCount = 0;
 
+    console.log("Data Processed, Rendering Started")
     buzzfeed.spawnHighchart();
     buzzfeed.loadAllPage();
     buzzfeed.loadCommentPage();
     buzzfeed.loadReactionPage();
+    console.log("Rendering Finished")
 
   }
 
@@ -624,7 +625,6 @@ var buzzfeed = (function () {
 
     //add the comment HTML to the page, will need to operate on it either way.
     var outer = document.getElementById(currContainer)
-    console.log(outer.hasChildNodes())
 
     outer.innerHTML = outer.innerHTML + "<div class='" + innerContainer + "' id='" + innerContainer + "'></div>"
     $('#' + innerContainer).attr('id', innerContainer + currPage);
