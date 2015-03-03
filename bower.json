@@ -1,7 +1,9 @@
 {
-  "name": "yo",
+  "name": "yowebapp",
   "private": true,
   "dependencies": {
-    "bootstrap": "~3.2.0"
+    "bootstrap-sass-official": "~3.2.0",
+    "underscore": "latest",
+    "highcharts": "latest"
   }
 }

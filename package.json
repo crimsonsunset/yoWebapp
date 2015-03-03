@@ -1,5 +1,5 @@
 {
-  "name": "yo",
+  "name": "yowebapp",
   "devDependencies": {
     "apache-server-configs": "^2.7.1",
     "grunt": "^0.4.5",
@@ -18,6 +18,7 @@
     "grunt-mocha": "^0.4.10",
     "grunt-newer": "^0.7.0",
     "grunt-rev": "^0.1.0",
+    "grunt-sass": "^0.14.0",
     "grunt-svgmin": "^0.4.0",
     "grunt-usemin": "^2.3.0",
     "grunt-wiredep": "^1.7.0",
