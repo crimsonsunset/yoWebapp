@@ -18,7 +18,12 @@ $(document).ready(function () {
   })
     .done(function (data, textStatus, jqXHR) {
 
-      var companyWidget = CompanyWidget("joesCompany", "JoesCompany", data);
+      widgetRef = {}
+
+      companyWidget = CompanyWidget("joesCompany", "JoesCompany", data);
+      companyWidget2 = CompanyWidget("joesCompany22", "JoesCompany22", data);
+
+      //var companyWidget2 = CompanyWidget("joesCompany22", "JoesCompany22", data);
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
 
@@ -29,18 +34,16 @@ $(document).ready(function () {
 
 });
 
-
 function CompanyWidget(divName, name, customerList) {
 
   var currWidget = {}
   currWidget.divName = "#" + divName;
   currWidget.name = name;
   currWidget.customerList = customerList;
-  widgetOperator.init(currWidget)
+  var myOperator = createOperator(currWidget)
 
-  return currWidget
+  return myOperator
 }
-
 
 // Note here that we are using Object.prototype.newMethod rather than
 // Object.prototype so as to avoid redefining the prototype object
@@ -48,205 +51,300 @@ CompanyWidget.prototype.toString = function () {
   console.log('toStringzz')
 };
 
-var widgetOperator = (function () {
+function createOperator(inWidget) {
 
-  var widgetOperator = {}
-  var company = {}
-  var currReviewIndex=0;
+  var returnOperator = (function () {
 
-  //highcharts configuration object that dictates styling
-  widgetOperator.highchartsConfig = {
-    chart: {
-      type: 'bar',
-      backgroundColor: "transparent"
-    },
-    colors: ["#B1D3FC"],
-    title: {
-      text: 'Monthly Average Rainfall',
-      style: {
-        display: "none"
-      }
-    },
-    subtitle: {
-      text: 'Source: WorldClimate.com',
-      style: {
-        display: "none"
-      }
-    },
-    legend: {
-      enabled: false
-    },
-    credits: {
-      enabled: false
-    },
-    exporting: {
-      enabled: false
-    },
-    xAxis: {
+    var widgetOperator = {}
+    var company = {}
+    var currReviewIndex = 0;
+    var starCounts = [0, 0, 0, 0, 0];
 
-      labels: {
-        formatter: function () {
-          return this.value;
+    //highcharts configuration object that dictates styling
+    widgetOperator.highchartsConfig = {
+      chart: {
+        type: 'bar',
+        backgroundColor: "transparent",
+        events: {
+          click: function (event) {
+            alert(this)
+          }
         }
       },
-      tickColor: 'E0E0E0',
-      lineColor: '#E0E0E0',
-      lineWidth: 0,
-      gridLineColor: "#F5f5f5",
-      gridLineWidth: 0,
-      categories: ["1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"]
-    },
-    yAxis: {
-      tickColor: 'E0E0E0',
-      lineColor: '#E0E0E0',
-      lineWidth: 0,
-      gridLineWidth: 0,
-      min: 0,
+      colors: ["#B1D3FC"],
       title: {
-        text: ''
+        text: 'Monthly Average Rainfall',
+        style: {
+          display: "none"
+        }
       },
-      style: {
-        display: "none"
+      subtitle: {
+        text: 'Source: WorldClimate.com',
+        style: {
+          display: "none"
+        }
       },
-
-      labels: {
+      legend: {
         enabled: false
-      }
-    },
-    tooltip: {
-      enabled: false
-    },
-    plotOptions: {
-      series: {
-        colorByPoint: true
       },
-      column: {
-        dataLabels: {
-          enabled: true
+      credits: {
+        enabled: false
+      },
+      exporting: {
+        enabled: false
+      },
+      xAxis: {
+
+        labels: {
+          formatter: function () {
+            return this.value;
+          }
         },
-        pointPadding: -.26,
-        borderWidth: 0
-      }
-    },
-    series: [{
-      name: 'Stars',
-      data: [49, 71, 106, 129, 144]
+        tickColor: 'E0E0E0',
+        lineColor: '#E0E0E0',
+        lineWidth: 0,
+        gridLineColor: "#F5f5f5",
+        gridLineWidth: 0,
+        categories: ["1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"]
+      },
+      yAxis: {
+        tickColor: 'E0E0E0',
+        lineColor: '#E0E0E0',
+        lineWidth: 0,
+        gridLineWidth: 0,
+        min: 0,
+        title: {
+          text: ''
+        },
+        style: {
+          display: "none"
+        },
 
-    }],
-    colors: ['#ED002B', '#FF6434', '#FFC543', '#62A44D', '#00A453']
-  }
+        labels: {
+          enabled: false
+        }
+      },
+      tooltip: {
+        enabled: false
+      },
+      plotOptions: {
+        series: {
+          colorByPoint: true
+        },
+        column: {
+          dataLabels: {
+            enabled: true
+          },
+          pointPadding: -.26,
+          borderWidth: 0
+        }
+      },
+      series: [{
+        name: 'Stars',
+        id: 'series-1',
+        data: [49, 71, 106, 129, 144]
+
+      }],
+      colors: ['#ED002B', '#FF6434', '#FFC543', '#62A44D', '#00A453']
+    }
 
 
-  calcStats = function () {
-    console.log(company.customerList)
+    calcStats = function () {
+      console.log(company.customerList)
 
-    var sum = 0;
-    $.each(company.customerList, function (i, e) {
-      sum += Number(e.starRating)
-    });
+      var sum = 0;
+      $.each(company.customerList, function (i, e) {
+        sum += Number(e.starRating)
+        starCounts[e.starRating - 1]++
+      });
+      console.log(starCounts)
 
-    //Math.round(original*10)/10
-    company.average = Math.round(sum / company.customerList.length * 10) / 10
-    console.log(sum)
-    console.log(company.average)
-
-
-  }
-  spawnTitle = function () {
-    company.divNames["title"] = "title-" + company.name;
-    company.divNames["subtitle"] = "subtitle-" + company.name;
-    var subtitleText = company.customerList.length + " Reviews | " + company.average + " Average"
-    $(company.divName).append($('<h1>', {id: company.divNames["title"], class: "title", text: company.name}))
-      .append($('<h3>', {id: company.divNames["subtitle"], class: "subtitle", text: subtitleText}))
-
-  }
-
-  spawnHighchart = function () {
+      //Math.round(original*10)/10
+      company.average = Math.round(sum / company.customerList.length * 10) / 10
+      console.log(sum)
+      console.log(company.average)
 
 
-    company.divNames["highcharts"] = "hc-" + company.name;
-    //$(company.divName).append($('<div>', {id: company.divNames["highcharts"], class: "highcharts"}))
+    }
+    spawnTitle = function () {
+      company.divNames["header"] = "header-" + company.name;
+      company.divNames["title"] = "title-" + company.name;
+      company.divNames["subtitle"] = "subtitle-" + company.name;
+      var subtitleText = company.customerList.length + " Reviews | " + company.average + " Average"
 
-    //prepare the data for insertion into the highcharts object
-    $('#' + company.divNames["highcharts"]).highcharts(widgetOperator.highchartsConfig);
+      $(company.divName).append($('<div>', {id: company.divNames["header"], class: "header"}))
 
-  }
 
-  spawnCardz = function () {
+      $("#" + company.divNames["header"]).append($('<h1>', {
+        id: company.divNames["title"],
+        class: "title",
+        text: company.name
+      }))
+        .append($('<h3>', {id: company.divNames["subtitle"], class: "subtitle", text: subtitleText}))
 
-    //spawn cardContainer
-    company.divNames["bigCard"] = "bigCard-" + company.name
-    $(company.divName).append($('<div>', {id: company.divNames["bigCard"], class: "bigCard"}))
+    }
 
-    //append subContainer to cardContainer
-    company.divNames["subCard"] = "subCard-" + company.name
-    $("#" + company.divNames["bigCard"]).append($('<div>', {id: company.divNames["subCard"], class: "subCard"}))
+    spawnHighchart = function () {
 
-  }
 
-  spawnCard = function () {
+      company.divNames["highcharts"] = "hc-" + company.name;
+      $(company.divName).append($('<div>', {id: company.divNames["highcharts"], class: "highcharts"}))
 
-    var subCardHTML = '<div class="subCard" id="subCard-' + company.name + '">\
+      //prepare the data for insertion into the highcharts object
+
+      widgetOperator.highchartsConfig.series[0].data = starCounts
+      widgetOperator.highchartsConfig.series[0].id = 'series-1-' + company.name
+
+      $('#' + company.divNames["highcharts"]).highcharts(widgetOperator.highchartsConfig);
+
+    }
+
+    spawnCardz = function () {
+
+      //spawn cardContainer
+      company.divNames["bigCard"] = "bigCard-" + company.name
+      $(company.divName).append($('<div>', {id: company.divNames["bigCard"], class: "bigCard"}))
+
+      //append subContainer to cardContainer
+      company.divNames["subCard"] = "subCard-" + company.name
+      $("#" + company.divNames["bigCard"]).append($('<div>', {id: company.divNames["subCard"], class: "subCard"}))
+
+    }
+
+    spawnSubCard = function () {
+
+      var subCardHTML = '<div class="subCard" id="subCard-' + company.name + '">\
     <div class="leftCardCol" id="leftCardCol-' + company.name + '">\
   <img class="avatar" src="images/erika-wolfe.png" id="avatar-' + company.name + '">\
   <h5 class="reviewerName" id="reviewerName-' + company.name + '"> Erika W.</h5>\
-  <input class="leftArrow" id="leftArrow-' + company.name + '" type="image" src="images/left_arrow.svg" onclick="alert()"/>\
-  <input class="rightArrow"id="rightArrow-' + company.name + '" type="image" src="images/right_arrow.svg" onclick="widgetOperator.nextComment()" />\
+  <div class="reviewBox" id="reviewBox-' + company.name + '"> \
+  <h5 class="reviewRating" id="reviewRating-' + company.name + '"> REVIEW TITLE</h5>\
+  <input class="leftArrow" id="leftArrow-' + company.name + '" type="image" src="images/left_arrow.svg" onclick="rotateCard(false,\'' + company.name + '\')"/>\
+  <input class="rightArrow"id="rightArrow-' + company.name + '"type="image" src="images/right_arrow.svg" onclick="rotateCard(true,\'' + company.name + '\')"/>\
+  </div>\
   </div>\
   <div class="rightCardCol" id="rightCardCol-' + company.name + '">\
-  <div class="reviewTitle" id="reviewTitle-' + company.name + '"> REVIEW TITLE</div>\
-  <div class="reviewBody" id="reviewBody-' + company.name + '"> THIS IS A BODY ASASASSA</div>\
+  <h5 class="reviewTitle" id="reviewTitle-' + company.name + '"> REVIEW TITLE</h5>\
+  <h5 class="reviewBody" id="reviewBody-' + company.name + '"> THIS IS A BODY ASASASSA</h5>\
   </div>\
   </div>'
 
 
-    //spawn cardContainer
-    company.divNames["bigCard"] = "bigCard-" + company.name
-    $(company.divName).append($('<div>', {id: company.divNames["bigCard"], class: "bigCard"}))
+      //spawn cardContainer
+      company.divNames["bigCard"] = "bigCard-" + company.name
+      $(company.divName).append($('<div>', {id: company.divNames["bigCard"], class: "bigCard"}))
 
-    //append subContainer to cardContainer
-    company.divNames["subCard"] = "subCard-" + company.name
-    $("#" + company.divNames["bigCard"]).html(subCardHTML)
+      //append subContainer to cardContainer
+      company.divNames["subCard"] = "subCard-" + company.name
+      $("#" + company.divNames["bigCard"]).html(subCardHTML)
 
+      widgetOperator.spawnCard()
 
+    }
 
+    widgetOperator.init = function (inCompany) {
+      company = inCompany;
+      company.divNames = {}
+      company.average = 0;
+      calcStats();
+      spawnTitle();
+      spawnHighchart();
+      spawnSubCard();
+      widgetRef[company.name] = widgetOperator
+    }
+    widgetOperator.rotateCard = function (isNext) {
 
-    var cardInfoObj = {
-      leftCardCol:{
-        reviewerName: company.customerList[currReviewIndex].fullName
-      },
-      rightCardCol:{
-        reviewTitle: company.customerList[currReviewIndex].reviewTitle,
-        reviewBody: company.customerList[currReviewIndex].reviewBody
+      //adjust indexes based on size of review array
+      (isNext) ? currReviewIndex++ : currReviewIndex--;
+
+      //next arrow has past bounds of array
+      if (currReviewIndex > company.customerList.length - 1) {
+        currReviewIndex = 0
       }
-    };
-
-    var person = {
-      firstname: 'John',
-      lastname: 'Wayne',
-      address: {
-        street: '4th Street',
-        city: 'San Francisco',
-        zip: 94199
+      //prev arrow has past bounds of array
+      else if (currReviewIndex < 0) {
+        currReviewIndex = company.customerList.length - 1
+      } else {
       }
-    };
 
-    $(".subCard").render(cardInfoObj);
+      widgetOperator.spawnCard();
+
+    }
+    widgetOperator.spawnCard = function () {
+
+      var imgUrl = "images/" + company.customerList[currReviewIndex].firstName.toLowerCase() + "-" + company.customerList[currReviewIndex].lastName.toLowerCase() + ".png"
+
+      //check if the reviewer has a avatar image. if not, use default.
+      $.ajax({
+        url: imgUrl,
+        async: false,
+        type: 'HEAD',
+        error: function () {
+          imgUrl = "images/default.png"
+        },
+        success: function () {
+        }
+      });
+
+      var directives = {
+        reviewerName: {
+          text: function (params) {
+            return company.customerList[currReviewIndex].fullName
+          }
+        },
+        avatar: {
+          src: function (params) {
+            return imgUrl
+          }
+        },
+        reviewTitle: {
+          text: function (params) {
+            return company.customerList[currReviewIndex].reviewTitle
+          }
+        },
+        reviewRating: {
+          text: function (params) {
+            return company.customerList[currReviewIndex].starRating + " Stars"
+          }
+        },
+        reviewBody: {
+          text: function (params) {
+            return company.customerList[currReviewIndex].reviewBody
+          }
+        }
+      };
+
+      $("#" + company.divNames["subCard"]).render({}, directives);
+
+      company.divNames["leftCardCol"] = "leftCardCol-" + company.name
+
+      //change background of left container to match the review they gave
+      $("#" + company.divNames["leftCardCol"]).css('background-color', widgetOperator.highchartsConfig.colors[company.customerList[currReviewIndex].starRating - 1])
+
+      $('#button').click(function () {
+
+        alert('sss')
+        if (i === chart.series[0].data.length) {
+          i = 0;
+        }
+        chart.series[0].data[i].select();
+        i += 1;
+      });
+
+    }
+
+    return widgetOperator
+  }());
+
+  returnOperator.init(inWidget)
+
+  return returnOperator
+
+}
 
 
+function rotateCard(isNext, inCompany) {
 
-  }
+  widgetRef[inCompany].rotateCard(isNext)
 
-  widgetOperator.init = function (inCompany) {
-    company = inCompany;
-    company.divNames = {}
-    company.average = 0;
-    calcStats();
-    //spawnTitle();
-    spawnHighchart();
-    spawnCard();
-
-  }
-
-  return widgetOperator
-}());
+}
