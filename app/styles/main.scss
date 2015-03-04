@@ -3,6 +3,82 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/boots
 @import "bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
 // endbower
 
+.companyWidget {
+  top:50%;
+  left:50%;
+  width:auto;
+  height:auto;
+
+  text-align:center;
+  border: 2px solid;
+  padding: 6px;
+  margin: 6px;
+//  background-color:black;
+}
+
+.companyWidget h1 {
+  margin:auto;
+  color:red;
+  line-height:50px;
+  vertical-align:middle;
+}
+.companyWidget h3 {
+  margin:auto;
+  color:blue;
+  line-height:50px;
+  vertical-align:middle;
+}
+
+.highcharts {
+  top:50%;
+  left:50%;
+  width:auto;
+  height:300px;
+  border: 2px dashed;
+}
+
+
+.bigCard {
+  margin-top: 20px;
+  top:50%;
+  left:50%;
+  width:auto;
+  height:300px;
+}
+
+.leftArrow {
+  height: 35px;
+}
+
+.rightArrow {
+  height: 35px;
+}
+
+.subCard {
+  top:50%;
+  left:50%;
+  width:auto;
+  height:300px;
+}
+.leftCardCol {
+  top:5%;
+  left:5%;
+  width:16%;
+  height:auto;
+  float: left;
+  border: 2px dashed;
+}
+.rightCardCol {
+  top:5%;
+  left:55%;
+  width:83%;
+  height:300px;
+  float: right;
+  border: 2px dashed;
+  text-align:left;
+}
+
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;

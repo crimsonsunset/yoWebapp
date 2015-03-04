@@ -21,50 +21,36 @@
     <![endif]-->
 
 
-    <div class="container">
-      <div class="header">
-        <ul class="nav nav-pills pull-right">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-        <h3 class="text-muted">yoWebapp</h3>
+
+      <div id="joesCompany" class="companyWidget" >
+        <!--<h1 class="title">JOES COMPANY</h1>-->
+        <!--<h3 class="subtitle">SUBTEXT HERE</h3>-->
+
+
+        <!--<div class="highcharts" id="hc-JoesCompany"></div>-->
+
+
+        <!--<div class="bigCard">-->
+
+          <!--<div class="subCard">-->
+            <!--<div class="leftCardCol">-->
+              <!--<img class="avatar" src="images/erika-wolfe.png">-->
+              <!--<h5 class="reviewerName"> Erika W.</h5>-->
+
+              <!--<input class="leftArrow" type="image" src="images/left_arrow.svg" onclick="widgetOperator.prevComment()"/>-->
+              <!--<input class="rightArrow"type="image" src="images/right_arrow.svg" onclick="widgetOperator.nextComment()" />-->
+
+            <!--</div>-->
+            <!--<div class="rightCardCol">-->
+              <!--<div class="reviewTitle"> REVIEW TITLE</div>-->
+              <!--<div class="reviewBody"> THIS IS A BODY ASASASSA</div>-->
+            <!--</div>-->
+
+          <!--</div>-->
+
+        <!--</div>-->
       </div>
 
-      <div class="jumbotron">
-        <h1>'Allo, 'Allo!</h1>
-        <p class="lead">Always a pleasure scaffolding your apps.</p>
-        <p><a class="btn btn-lg btn-success" href="#">Splendid! <span class="glyphicon glyphicon-ok"></span></a></p>
-      </div>
-
-      <div class="jumbotron">
-
-        <div id="highcharts" style=" height: 275px; border: 2px dashed;"></div>
-      </div>
-
-      <div class="row marketing">
-        <div class="col-lg-6">
-
-
-          <h4>HTML5 Boilerplate</h4>
-          <p>HTML5 Boilerplate is a professional front-end template for building fast, robust, and adaptable web apps or sites.</p>
-
-          <h4>Sass</h4>
-          <p>Sass is a mature, stable, and powerful professional grade CSS extension language.</p>
-
-
-          <h4>Bootstrap</h4>
-          <p>Sleek, intuitive, and powerful mobile first front-end framework for faster and easier web development.</p>
-
-
-        </div>
-      </div>
-
-      <div class="footer">
-        <p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
-      </div>
-
-    </div>
 
 
     <!-- build:js(.) scripts/vendor.js -->
@@ -84,18 +70,13 @@
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/highcharts/highcharts.js"></script>
+    <script src="bower_components/highcharts/highcharts-more.js"></script>
+    <script src="bower_components/highcharts/modules/exporting.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-    <script>
-      (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-      function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-      e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-      e.src='//www.google-analytics.com/analytics.js';
-      r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-      ga('create','UA-XXXXX-X');ga('send','pageview');
-    </script>
+
 
         <!-- build:js({app,.tmp}) scripts/main.js -->
         <script src="scripts/main.js"></script>
