@@ -4,6 +4,7 @@
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0",
     "underscore": "latest",
-    "highcharts": "latest"
+    "highcharts": "latest",
+    "transparency": "latest"
   }
 }

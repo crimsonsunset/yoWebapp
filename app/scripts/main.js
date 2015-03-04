@@ -27,7 +27,6 @@ $(document).ready(function () {
     })
 
 
-
 });
 
 
@@ -53,7 +52,7 @@ var widgetOperator = (function () {
 
   var widgetOperator = {}
   var company = {}
-  widgetOperator
+  var currReviewIndex=0;
 
   //highcharts configuration object that dictates styling
   widgetOperator.highchartsConfig = {
@@ -95,7 +94,7 @@ var widgetOperator = (function () {
       lineWidth: 0,
       gridLineColor: "#F5f5f5",
       gridLineWidth: 0,
-      categories: ["1 Star","2 Stars","3 Stars","4 Stars","5 Stars"]
+      categories: ["1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"]
     },
     yAxis: {
       tickColor: 'E0E0E0',
@@ -118,7 +117,7 @@ var widgetOperator = (function () {
       enabled: false
     },
     plotOptions: {
-      series:{
+      series: {
         colorByPoint: true
       },
       column: {
@@ -141,13 +140,13 @@ var widgetOperator = (function () {
   calcStats = function () {
     console.log(company.customerList)
 
-    var sum=0;
-    $.each(company.customerList, function( i, e ) {
-      sum+= Number(e.starRating)
+    var sum = 0;
+    $.each(company.customerList, function (i, e) {
+      sum += Number(e.starRating)
     });
 
     //Math.round(original*10)/10
-    company.average = Math.round(sum/company.customerList.length*10)/10
+    company.average = Math.round(sum / company.customerList.length * 10) / 10
     console.log(sum)
     console.log(company.average)
 
@@ -166,14 +165,14 @@ var widgetOperator = (function () {
 
 
     company.divNames["highcharts"] = "hc-" + company.name;
-    $(company.divName).append($('<div>', {id: company.divNames["highcharts"], class: "highcharts"}))
+    //$(company.divName).append($('<div>', {id: company.divNames["highcharts"], class: "highcharts"}))
 
     //prepare the data for insertion into the highcharts object
     $('#' + company.divNames["highcharts"]).highcharts(widgetOperator.highchartsConfig);
 
   }
 
-  spawnCard = function () {
+  spawnCardz = function () {
 
     //spawn cardContainer
     company.divNames["bigCard"] = "bigCard-" + company.name
@@ -181,16 +180,69 @@ var widgetOperator = (function () {
 
     //append subContainer to cardContainer
     company.divNames["subCard"] = "subCard-" + company.name
-    $("#"+company.divNames["bigCard"]).append($('<div>', {id: company.divNames["subCard"], class: "subCard"}))
+    $("#" + company.divNames["bigCard"]).append($('<div>', {id: company.divNames["subCard"], class: "subCard"}))
+
+  }
+
+  spawnCard = function () {
+
+    var subCardHTML = '<div class="subCard" id="subCard-' + company.name + '">\
+    <div class="leftCardCol" id="leftCardCol-' + company.name + '">\
+  <img class="avatar" src="images/erika-wolfe.png" id="avatar-' + company.name + '">\
+  <h5 class="reviewerName" id="reviewerName-' + company.name + '"> Erika W.</h5>\
+  <input class="leftArrow" id="leftArrow-' + company.name + '" type="image" src="images/left_arrow.svg" onclick="alert()"/>\
+  <input class="rightArrow"id="rightArrow-' + company.name + '" type="image" src="images/right_arrow.svg" onclick="widgetOperator.nextComment()" />\
+  </div>\
+  <div class="rightCardCol" id="rightCardCol-' + company.name + '">\
+  <div class="reviewTitle" id="reviewTitle-' + company.name + '"> REVIEW TITLE</div>\
+  <div class="reviewBody" id="reviewBody-' + company.name + '"> THIS IS A BODY ASASASSA</div>\
+  </div>\
+  </div>'
+
+
+    //spawn cardContainer
+    company.divNames["bigCard"] = "bigCard-" + company.name
+    $(company.divName).append($('<div>', {id: company.divNames["bigCard"], class: "bigCard"}))
+
+    //append subContainer to cardContainer
+    company.divNames["subCard"] = "subCard-" + company.name
+    $("#" + company.divNames["bigCard"]).html(subCardHTML)
+
+
+
+
+    var cardInfoObj = {
+      leftCardCol:{
+        reviewerName: company.customerList[currReviewIndex].fullName
+      },
+      rightCardCol:{
+        reviewTitle: company.customerList[currReviewIndex].reviewTitle,
+        reviewBody: company.customerList[currReviewIndex].reviewBody
+      }
+    };
+
+    var person = {
+      firstname: 'John',
+      lastname: 'Wayne',
+      address: {
+        street: '4th Street',
+        city: 'San Francisco',
+        zip: 94199
+      }
+    };
+
+    $(".subCard").render(cardInfoObj);
+
+
 
   }
 
   widgetOperator.init = function (inCompany) {
     company = inCompany;
     company.divNames = {}
-    company.average=0;
+    company.average = 0;
     calcStats();
-    spawnTitle();
+    //spawnTitle();
     spawnHighchart();
     spawnCard();
 
