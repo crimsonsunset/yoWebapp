@@ -20,7 +20,7 @@ $(document).ready(function () {
 
       widgetRef = {}
 
-      companyWidget = CompanyWidget("joesCompany", "JoesCompany", "data");
+      companyWidget = CompanyWidget("joesCompany", "JoesCompany", data);
       companyWidget2 = CompanyWidget("joesCompany22", "JoesCompany22", data);
 
       //var companyWidget2 = CompanyWidget("joesCompany22", "JoesCompany22", data);
