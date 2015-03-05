@@ -20,7 +20,7 @@ $(document).ready(function () {
 
       widgetRef = {}
 
-      companyWidget = CompanyWidget("joesCompany", "JoesCompany", data);
+      companyWidget = CompanyWidget("joesCompany", "JoesCompany", "data");
       companyWidget2 = CompanyWidget("joesCompany22", "JoesCompany22", data);
 
       //var companyWidget2 = CompanyWidget("joesCompany22", "JoesCompany22", data);
@@ -59,6 +59,7 @@ function createOperator(inWidget) {
     var company = {}
     var currReviewIndex = 0;
     var starCounts = [0, 0, 0, 0, 0];
+    var lastSelectedRating = -1;
 
     //highcharts configuration object that dictates styling
     widgetOperator.highchartsConfig = {
@@ -66,20 +67,20 @@ function createOperator(inWidget) {
         type: 'bar',
         backgroundColor: "transparent",
         events: {
-          click: function (event) {
-            alert(this)
+          select: function (event) {
+            alert("this")
           }
         }
       },
       colors: ["#B1D3FC"],
       title: {
-        text: 'Monthly Average Rainfall',
+        text: '',
         style: {
           display: "none"
         }
       },
       subtitle: {
-        text: 'Source: WorldClimate.com',
+        text: '',
         style: {
           display: "none"
         }
@@ -127,9 +128,24 @@ function createOperator(inWidget) {
       tooltip: {
         enabled: false
       },
+
       plotOptions: {
         series: {
-          colorByPoint: true
+          colorByPoint: true,
+          allowPointSelect: true,
+          states: {
+            select: {
+              color: null,
+              borderWidth:10,
+              borderColor:'blue'
+            }
+          },
+          point: {
+            events: {
+              select: function () {
+              }
+            }
+          }
         },
         column: {
           dataLabels: {
@@ -316,20 +332,26 @@ function createOperator(inWidget) {
 
       $("#" + company.divNames["subCard"]).render({}, directives);
 
+      //$('.reviewBody').succinct({
+      //  size: 120
+      //});
+
       company.divNames["leftCardCol"] = "leftCardCol-" + company.name
 
       //change background of left container to match the review they gave
       $("#" + company.divNames["leftCardCol"]).css('background-color', widgetOperator.highchartsConfig.colors[company.customerList[currReviewIndex].starRating - 1])
 
-      $('#button').click(function () {
 
-        alert('sss')
-        if (i === chart.series[0].data.length) {
-          i = 0;
-        }
-        chart.series[0].data[i].select();
-        i += 1;
-      });
+      //code that is used to select the bar associated with the current review.
+      var chart = $("#"+company.divNames["highcharts"]).highcharts()
+
+      //if the last review had the same star rating, no need to select it again.
+      if (lastSelectedRating != company.customerList[currReviewIndex].starRating ) {
+        chart.series[0].data[company.customerList[currReviewIndex].starRating-1].select();
+        lastSelectedRating = company.customerList[currReviewIndex].starRating
+      } else {
+
+      }
 
     }
 
