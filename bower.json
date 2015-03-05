@@ -2,7 +2,7 @@
   "name": "Test Pilot Code Challenge",
   "private": true,
   "dependencies": {
-    "bootstrap-sass-official": "~3.2.0",
+    "jquery": "latest",
     "highcharts": "latest",
     "transparency": "latest"
   }
