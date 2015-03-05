@@ -136,6 +136,7 @@ function createOperator(inWidget) {
       widget.divNames["header"] = "header-" + widget.id;
       widget.divNames["title"] = "title-" + widget.id;
       widget.divNames["subtitle"] = "subtitle-" + widget.id;
+      widget.divNames["logo"] = "logo-" + widget.id;
       var subtitleText = widget.customerList.length + " Reviews | " + widget.average + " Average"
 
       $(widget.divName).append($('<div>', {id: widget.divNames["header"], class: "header"}))
@@ -147,7 +148,7 @@ function createOperator(inWidget) {
         text: widget.name
       }))
         .append($('<h3>', {id: widget.divNames["subtitle"], class: "subtitle", text: subtitleText}))
-
+        .append($('<img>', {id: widget.divNames["logo"], class: "logo", src: "images/trustpilot-logo-light-bg-120x18.png"}))
     }
 
 
@@ -168,7 +169,6 @@ function createOperator(inWidget) {
       $('#' + widget.divNames["highcharts"]).highcharts(widgetOperator.highchartsConfig);
 
     }
-
 
     /**
      * Function used to spawn the bottom container that will house the reviewer cards

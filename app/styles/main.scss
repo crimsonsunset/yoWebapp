@@ -6,7 +6,10 @@
 }
 .avatarBox{
   height:160px;
- }
+}
+.logo{
+  padding-bottom: 11px;
+}
 
 .header{
   background-color: #A5D6A7;
@@ -21,6 +24,7 @@
   border: 2px solid;
   padding: 6px;
   margin: 6px;
+  max-width: 1024px;
 }
 
 .companyWidget h1 {
@@ -76,15 +80,14 @@
   text-overflow: ellipsis;
 }
 
-.reviewBody {
-   display: block;
-   display: -webkit-box;
-   margin: 0 auto;
-   line-height: 1.4;
-   -webkit-line-clamp: 12;
-   -webkit-box-orient: vertical;
-   overflow: hidden;
-   text-overflow: ellipsis;
+.reviewBody {  display: block;
+  display: -webkit-box;
+  height: 208px;
+  font-weight: normal;
+  font-size: 15px;
+  -webkit-box-orient: vertical;
+  overflow: scroll;
+  text-overflow: ellipsis;
  }
 
 
@@ -127,7 +130,7 @@ body {
 }
 
 
-/* Responsive: Portrait tablets and up */
+/* Responsive */
 @media screen and (max-width: 550px) {
 
   .avatar{

@@ -8,8 +8,8 @@ $(document).ready(function () {
 
   widgetRouter = {}
   //all that is needed to create a widget is one line calling its constructor
-  companyWidget = CompanyWidget("joesCompany", "Joes Awesome Company", "scripts/data/reviews.json");
-  //companyWidget2 = CompanyWidget("joesCompany22", "ScrollMotion", "scripts/data/reviews2.json");
+  companyWidget = CompanyWidget("joesCompany", "Joe's Awesome Company", "scripts/data/reviews.json");
+  companyWidget2 = CompanyWidget("joesCompany22", "ScrollMotion", "scripts/data/reviews2.json");
 });
 
 
