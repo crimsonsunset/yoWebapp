@@ -4,6 +4,9 @@
   margin-top: 6px;
   border: 4px groove;
 }
+.avatarBox{
+  height:160px;
+ }
 
 .header{
   background-color: #A5D6A7;
@@ -14,7 +17,6 @@
   left:50%;
   width:auto;
   height:auto;
-
   text-align:center;
   border: 2px solid;
   padding: 6px;
@@ -64,8 +66,27 @@
 //  border: 2px dashed;
   position: absolute;
   bottom: 0;
-  width:100%;
+  width:90%;
 }
+.reviewTitle {
+  width: 100%;
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reviewBody {
+   display: block;
+   display: -webkit-box;
+   margin: 0 auto;
+   line-height: 1.4;
+   -webkit-line-clamp: 12;
+   -webkit-box-orient: vertical;
+   overflow: hidden;
+   text-overflow: ellipsis;
+ }
+
 
 .bigCard {
   background-color: #A5D6A7;
@@ -85,7 +106,6 @@
   width:16%;
   height:300px;
   float: left;
-  background-color: #00b3ee;
 //  border: 2px dashed;
 }
 .rightCardCol {
@@ -94,6 +114,7 @@
   width:80%;
   height:300px;
   float: right;
+  margin-right: 10px;
 //  border: 2px dashed;
   text-align:left;
 }
@@ -102,7 +123,7 @@
 body {
   padding-top: 20px;
   padding-bottom: 20px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 

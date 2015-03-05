@@ -1,10 +1,8 @@
 {
-  "name": "yowebapp",
+  "name": "Test Pilot Code Challenge",
   "private": true,
   "dependencies": {
     "bootstrap-sass-official": "~3.2.0",
-    "succinct": "latest",
-    "underscore": "latest",
     "highcharts": "latest",
     "transparency": "latest"
   }
